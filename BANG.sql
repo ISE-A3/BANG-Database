@@ -3,6 +3,18 @@
 /* Created on:     11-12-2018 10:33:41                          */
 /*==============================================================*/
 
+USE master
+GO
+
+ if db_id('BANG') is not null
+	DROP DATABASE BANG
+GO
+
+ CREATE DATABASE BANG
+GO
+
+ USE BANG
+GO
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
@@ -171,7 +183,7 @@ go
 /* Domain: DATUM                                                */
 /*==============================================================*/
 create type DATUM
-   from datetime
+   from date
 go
 
 /*==============================================================*/
