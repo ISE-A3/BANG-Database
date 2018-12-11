@@ -1,20 +1,8 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     10-12-2018 15:34:32                          */
+/* Created on:     11-12-2018 10:33:41                          */
 /*==============================================================*/
 
-USE master
-GO
-
-if db_id('BANG') is not null
-	DROP DATABASE BANG
-GO
-
-CREATE DATABASE BANG
-GO
-
-USE BANG
-GO
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
@@ -183,7 +171,7 @@ go
 /* Domain: DATUM                                                */
 /*==============================================================*/
 create type DATUM
-   from date
+   from datetime
 go
 
 /*==============================================================*/
@@ -315,7 +303,7 @@ create table TOP5 (
    EMAILADRES           EMAILADRES           not null,
    E_ID                 ID                   not null,
    constraint PK_TOP5 primary key (TOP5_ID),
-   constraint AK_ALT_TOP5_TOP5 unique (EMAILADRES)
+   constraint AK_ALT_TOP5_TOP5 unique (EMAILADRES, E_ID)
 )
 go
 
