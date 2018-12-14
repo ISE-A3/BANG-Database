@@ -225,7 +225,7 @@ go
 /* Domain: DATUM                                                */
 /*==============================================================*/
 create type DATUM
-   from datetime
+   from date
 go
 
 /*==============================================================*/
@@ -295,7 +295,7 @@ go
 create table EVENEMENT (
    E_NAAM               NAAM                 not null,
    E_DATUM              DATUM                not null,
-   E_ID                 SURROGATE_KEY        not null,
+   E_ID                 SURROGATE_KEY        identity,
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
@@ -331,7 +331,7 @@ go
 /*==============================================================*/
 create table NUMMER (
    TITEL                NAAM                 not null,
-   N_ID                 SURROGATE_KEY        not null,
+   N_ID                 SURROGATE_KEY        identity,
    A_NAAM               NAAM                 not null,
    constraint PK_NUMMER primary key nonclustered (N_ID),
    constraint AK_NATURAL_NUMMER unique (TITEL, A_NAAM)
@@ -447,4 +447,3 @@ alter table TOP100
    add constraint FK_TOP100_IS_EEN_EV_EVENEMEN foreign key (E_ID)
       references EVENEMENT (E_ID)
 go
-
