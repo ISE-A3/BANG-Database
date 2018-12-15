@@ -1,10 +1,9 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_UpdateTitel_Update
-@oldTitel varchar(256),
-@artiest varchar(256),
-@newTitel varchar(256)
+CREATE or ALTER PROCEDURE dbo.sp_UpdateArtiest_Update
+@OldArtiest varchar(256),
+@newArtiest varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -13,13 +12,15 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if (@oldTitel = @newTitel )
-		throw 50100, 'There is nothing to be updated.', 1
+		if (@OldArtiest = @newArtiest )
+		throw 50100, 'There is nothing to be updated.', 3
 		
-		update NUMMER
-		set TITEL = @newTitel
-		where TITEL = @oldTitel
-			and A_NAAM = @artiest;
+		if not exists (select '' from ARTIEST a where a.A_NAAM = @OldArtiest)
+		throw 50101, 'Artist does not exist.', 1
+
+		update ARTIEST
+		set A_NAAM = @newArtiest
+		where A_NAAM = @OldArtiest;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

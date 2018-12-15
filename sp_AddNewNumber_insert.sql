@@ -1,7 +1,7 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_AddNewNumber_insert 
+CREATE or ALTER PROCEDURE dbo.sp_AddNewNummer_insert 
 @titel varchar(256),
 @artiest varchar(256)
 AS
@@ -12,9 +12,15 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		insert into NUMMER(TITEL, ARTIEST)
-		values (@titel, @artiest)
+		if not exists (select '' from ARTIEST a where a.A_NAAM = @artiest)
+		begin
+			insert into ARTIEST (A_NAAM)
+			values (@artiest)
+		end
 		
+		insert into NUMMER(TITEL, A_NAAM)
+		values (@titel, @artiest)
+
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
