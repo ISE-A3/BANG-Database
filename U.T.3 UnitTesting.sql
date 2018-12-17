@@ -22,7 +22,8 @@ BEGIN
 			('My Immortal', 6, 'Evanescence'),
 			('the lonely', 7, 'Christina Perri'),
 			('The Last Goodbye', 8, 'Billy Boyd'),
-			('Gotta Catch ''M All (Pokemon Theme Song)', 9, 'Jason Paige');
+			('Gotta Catch ''M All (Pokemon Theme Song)', 9, 'Jason Paige'),
+			('Road of Resistance', 10, 'BABYMETAL');
 
 	insert into STEM (E_ID, EMAILADRES, WEGING, N_ID)
 	values	(1, 'formaat_it@outlook.com', 5, 1),
@@ -30,7 +31,7 @@ BEGIN
 			(1, 'formaat_it@outlook.com', 3, 3),
 			(1, 'formaat_it@outlook.com', 2, 4),
 			(1, 'formaat_it@outlook.com', 1, 5),
-			(1, 'Dinges@outlook.com', 5, 6),
+			(1, 'Dinges@outlook.com', 5, 10),
 			(1, 'Dinges@outlook.com', 4, 7),
 			(1, 'Dinges@outlook.com', 3, 8),
 			(1, 'Dinges@outlook.com', 2, 9),
@@ -39,7 +40,7 @@ BEGIN
 			(1, 'ergrgsr@srgagaer.nl', 4, 3),
 			(1, 'ergrgsr@srgagaer.nl', 3, 4),
 			(1, 'ergrgsr@srgagaer.nl', 2, 5),
-			(1, 'ergrgsr@srgagaer.nl', 1, 6);
+			(1, 'ergrgsr@srgagaer.nl', 1, 10);
 END;
 GO
 
