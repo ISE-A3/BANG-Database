@@ -13,10 +13,13 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		if (@OldArtiest = @newArtiest )
-		throw 50100, 'There is nothing to be updated.', 3
-		
+		throw 50100, 'Er zijn geen veranderingen.', 3
+				
 		if not exists (select '' from ARTIEST a where a.A_NAAM = @OldArtiest)
-		throw 50101, 'Artist does not exist.', 1
+		throw 50101, 'Artiest bestaat niet.', 1
+
+		if exists (select '' from ARTIEST a where a.A_NAAM = @newArtiest)
+		throw 50101, 'De veranderde artiest bestaat al.', 1
 
 		update ARTIEST
 		set A_NAAM = @newArtiest

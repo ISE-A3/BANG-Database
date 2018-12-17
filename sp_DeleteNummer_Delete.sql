@@ -1,7 +1,7 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_AddNewNummer_insert 
+CREATE or ALTER PROCEDURE dbo.sp_DeleteNummer_Delete
 @titel varchar(256),
 @artiest varchar(256)
 AS
@@ -12,17 +12,15 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if exists (select * from NUMMER where TITEL = @titel and A_NAAM = @artiest)
-		throw 50107, 'Dit nummer bestaat al.', 1
+		if not exists (select '' from NUMMER where TITEL = @titel and A_NAAM = @artiest)
+		throw 50106, 'Dit nummer bestaat niet.', 1
+
+		delete from NUMMER
+		where TITEL = @titel
+		and A_NAAM = @artiest
 		
-		if not exists (select '' from ARTIEST a where a.A_NAAM = @artiest)
-		begin
-			insert into ARTIEST (A_NAAM)
-			values (@artiest)
-		end
-		
-		insert into NUMMER(TITEL, A_NAAM)
-		values (@titel, @artiest)
+		if not exists (select '' from NUMMER where A_NAAM = @artiest)
+		execute sp_DeleteArtiest_Delete @artiest = @artiest
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
