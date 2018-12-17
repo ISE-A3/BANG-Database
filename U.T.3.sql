@@ -2,7 +2,11 @@ USE BANG;
 GO
 
 CREATE or ALTER PROCEDURE dbo.sp_GenereerOngefilterdeTop100Lijst_select
-	@evenement integer
+	@EvenementNaam varchar(256),
+	@EvenementDatum date,
+	@Plaatsnaam varchar(1024),
+	@Adres varchar(2014),
+	@Huisnummer integer
 AS
 BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -14,7 +18,15 @@ BEGIN
 		SELECT n1.TITEL, n1.A_NAAM, SUM(s1.WEGING) AS score
 		FROM NUMMER n1 RIGHT OUTER JOIN STEM s1
 		ON n1.N_ID = s1.N_ID
-		WHERE s1.E_ID = @evenement
+		WHERE s1.E_ID = (
+			SELECT E_ID
+			FROM EVENEMENT
+			WHERE E_NAAM = @EvenementNaam
+			AND E_DATUM = @EvenementDatum
+			AND PLAATSNAAM = @Plaatsnaam
+			AND ADRES = @Adres
+			AND HUISNUMMER = @Huisnummer
+			)
 		GROUP BY n1.TITEL, n1.A_NAAM
 		ORDER BY score DESC;
 

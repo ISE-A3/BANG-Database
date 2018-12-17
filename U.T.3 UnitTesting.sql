@@ -6,8 +6,12 @@ CREATE PROCEDURE [U.T.3Test].[SetUp]
 AS
 BEGIN
     PRINT 'Do some setup work';
+	EXEC tSQLt.FakeTable 'dbo.EVENEMENT';
     EXEC tSQLt.FakeTable 'dbo.STEM';
     EXEC tSQLt.FakeTable 'dbo.NUMMER';
+
+	insert into EVENEMENT (E_NAAM, E_DATUM, E_ID, PLAATSNAAM, ADRES, HUISNUMMER)
+	values ('Kerst event', '2018-12-21', 1, 'Arnhem', 'Ruitenberglaan', 26);
 
 	insert into NUMMER (TITEL, N_ID, A_NAAM)
 	values	('Born To Be Alive', 1, 'The Village People'),
@@ -44,7 +48,7 @@ AS
 BEGIN
     EXEC tSQLt.ExpectNoException;
 	
-	EXEC dbo.sp_GenereerOngefilterdeTop100Lijst_select @evenement = 1;
+	EXEC dbo.sp_GenereerOngefilterdeTop100Lijst_select @EvenementNaam = 'Kerst event', @EvenementDatum = '2018-12-21', @Plaatsnaam = 'Arnhem', @Adres = 'Ruitenberglaan', @Huisnummer = 26;
 END;
 GO
 
