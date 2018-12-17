@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     14-12-2018 11:38:15                          */
+/* Created on:     17-12-2018 09:51:18                          */
 /*==============================================================*/
 
 USE master
@@ -300,7 +300,7 @@ create table EVENEMENT (
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
    constraint PK_EVENEMENT primary key nonclustered (E_ID),
-   constraint AK_NATURAL_EVENEMEN unique (E_NAAM, E_DATUM)
+   constraint AK_NATURAL_EVENEMEN unique (E_NAAM, E_DATUM, PLAATSNAAM, ADRES, HUISNUMMER)
 )
 go
 
