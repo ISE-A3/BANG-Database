@@ -1,9 +1,17 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_UpdateArtiest_Update
-@OldArtiest varchar(256),
-@newArtiest varchar(256)
+/*
+ADD EVENT
+*/
+
+CREATE or ALTER PROCEDURE dbo.usp_Evenement_Add
+@EVENEMENT_NAAM varchar(256),
+@EVENEMENT_DATUM date,
+@LOCATIENAAM varchar(256),
+@PLAATSNAAM varchar(256),
+@ADRES varchar(256),
+@HUISNUMMER int
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,18 +20,13 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if (@OldArtiest = @newArtiest )
-		throw 50100, 'Er zijn geen veranderingen.', 3
-				
-		if not exists (select '' from ARTIEST a where a.A_NAAM = @OldArtiest)
-		throw 50101, 'Artiest bestaat niet.', 1
+		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER)
+			EXEC dbo.usp_Locatie_Insert @LOCATIENAAM = @LOCATIENAAM, @PLAATSNAAM = @PLAATSNAAM, @ADRES = @ADRES, @HUISNUMMER = @HUISNUMMER
 
-		if exists (select '' from ARTIEST a where a.A_NAAM = @newArtiest)
-		throw 50101, 'De veranderde artiest bestaat al.', 1
-
-		update ARTIEST
-		set A_NAAM = @newArtiest
-		where A_NAAM = @OldArtiest;
+		IF EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER)
+			EXEC dbo.usp_Evenement_insert @EVENEMENT_NAAM = @EVENEMENT_NAAM, @EVENEMENT_DATUM = @EVENEMENT_DATUM, @PLAATSNAAM = @PLAATSNAAM, @ADRES = @ADRES, @HUISNUMMER = @HUISNUMMER
+		ELSE
+			THROW 50203, 'De locatie bestaat niet', 1  
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

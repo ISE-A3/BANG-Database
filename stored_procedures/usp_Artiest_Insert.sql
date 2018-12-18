@@ -12,10 +12,10 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		if exists (select '' from ARTIEST where ARTIEST_NAAM = @artiest)
-		throw 50104, 'Deze Artiest bestaat al.', 1
+		throw 50104, 'Deze Artiest bestaat al.', 1;
 
 		insert into ARTIEST (ARTIEST_NAAM)
-		Values (@artiest)
+		Values (@artiest);
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

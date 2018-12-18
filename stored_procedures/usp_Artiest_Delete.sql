@@ -12,7 +12,7 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		if not exists (select '' from ARTIEST where ARTIEST_NAAM = @artiest)
-		throw 50105, 'De artiest bestaat niet.', 1
+		throw 50105, 'De artiest bestaat niet.', 1;
 		
 		if exists	(	SELECT '' 
 						FROM NUMMER N 
@@ -20,10 +20,10 @@ BEGIN
 						ON N.ARTIEST_ID = A.ARTIEST_ID 
 						WHERE ARTIEST_NAAM = @artiest
 					)
-		throw 50103, 'Er is nog een nummer gekoppeld aan deze artiest.', 1
+		throw 50103, 'Er is nog een nummer gekoppeld aan deze artiest.', 1;
 
 		delete from ARTIEST
-		where ARTIEST_NAAM = @artiest
+		where ARTIEST_NAAM = @artiest;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

@@ -1,7 +1,9 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_SelectAlleNummers_select 
+CREATE or ALTER PROCEDURE dbo.usp_Artiest_Update
+@OldArtiest varchar(256),
+@newArtiest varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -10,7 +12,18 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		select n.TITEL, n.A_NAAM from NUMMER n
+		if (@OldArtiest = @newArtiest )
+		throw 50100, 'Er zijn geen veranderingen.', 3;
+				
+		if not exists (select '' from ARTIEST a where a.ARTIEST_NAAM = @OldArtiest)
+		throw 50101, 'Artiest bestaat niet.', 1;
+
+		if exists (select '' from ARTIEST a where a.ARTIEST_NAAM = @newArtiest)
+		throw 50101, 'De veranderde artiest bestaat al.', 1;
+
+		update ARTIEST
+		set ARTIEST_NAAM = @newArtiest
+		where ARTIEST_NAAM = @OldArtiest;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

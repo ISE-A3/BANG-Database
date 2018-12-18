@@ -1,10 +1,15 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.usp_Nummer_UpdateTitel
-@oldTitel varchar(256),
-@artiest varchar(256),
-@newTitel varchar(256)
+/*
+INSERT LOCATIE
+*/
+
+CREATE or ALTER PROCEDURE dbo.usp_Locatie_Insert
+@LOCATIENAAM varchar(256),
+@PLAATSNAAM varchar(256),
+@ADRES varchar(256),
+@HUISNUMMER int
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -13,23 +18,11 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if (@oldTitel = @newTitel)
-		throw 50100, 'Er zijn geen veranderingen.', 1;
+		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER)
+			INSERT INTO LOCATIE
+			VALUES (@LOCATIENAAM, @PLAATSNAAM, @ADRES, @HUISNUMMER)
 
-		IF NOT EXISTS	(	SELECT '' 
-							FROM NUMMER N 
-							INNER JOIN ARTIEST A 
-							ON N.ARTIEST_ID = A.ARTIEST_ID 
-							WHERE  NUMMER_TITEL = @oldTitel 
-							AND ARTIEST_NAAM = @artiest
-						)
-		throw 50106, 'Dit nummer bestaat niet.', 1;
-		
-		update NUMMER
-		set NUMMER_TITEL = @newTitel
-		where NUMMER_TITEL = @oldTitel
-		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @artiest);
-		
+
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  

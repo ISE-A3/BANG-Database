@@ -15,7 +15,7 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		if (@oldArtiest = @newArtiest)
-		throw 50100, 'Er zijn geen veranderingen.', 1
+		throw 50100, 'Er zijn geen veranderingen.', 1;
 
 		IF NOT EXISTS	(	SELECT '' 
 							FROM NUMMER N 
@@ -24,11 +24,11 @@ BEGIN
 							WHERE  NUMMER_TITEL = @titel 
 							AND ARTIEST_NAAM = @oldArtiest
 						)
-		throw 50106, 'Dit nummer bestaat niet.', 1
+		throw 50106, 'Dit nummer bestaat niet.', 1;
 		
 		if not exists(select '' from ARTIEST where ARTIEST_NAAM = @newArtiest)
 		begin
-			execute dbo.usp_Artiest_Insert @artiest = @newArtiest
+			execute dbo.usp_Artiest_Insert @artiest = @newArtiest;
 		end
 		
 		update NUMMER
@@ -37,7 +37,7 @@ BEGIN
 		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @oldArtiest);
 		
 		if not exists (select '' from NUMMER where ARTIEST_ID = @oldArtiest)
-		execute dbo.usp_Artiest_Delete @artiest = @oldArtiest
+		execute dbo.usp_Artiest_Delete @artiest = @oldArtiest;
 		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
