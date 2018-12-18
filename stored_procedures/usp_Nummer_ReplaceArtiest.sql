@@ -1,8 +1,11 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_AddNewArtiest_Insert
-@artiest varchar(256)
+
+CREATE or ALTER PROCEDURE dbo.usp_Nummer_ReplaceArtiest
+@titel varchar(256),
+@oldArtiest varchar(256),
+@newArtiest varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -11,12 +14,31 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if exists (select '' from ARTIEST where A_NAAM = @artiest)
-		throw 50104, 'Deze Artiest bestaat al.', 1
+		if (@oldArtiest = @newArtiest)
+		throw 50100, 'Er zijn geen veranderingen.', 1
 
-		insert into ARTIEST (A_NAAM)
-		Values (@artiest)
-
+		IF NOT EXISTS	(	SELECT '' 
+							FROM NUMMER N 
+							INNER JOIN ARTIEST A 
+							ON N.ARTIEST_ID = A.ARTIEST_ID 
+							WHERE  NUMMER_TITEL = @titel 
+							AND ARTIEST_NAAM = @oldArtiest
+						)
+		throw 50106, 'Dit nummer bestaat niet.', 1
+		
+		if not exists(select '' from ARTIEST where ARTIEST_NAAM = @newArtiest)
+		begin
+			execute dbo.usp_Artiest_Insert @artiest = @newArtiest
+		end
+		
+		update NUMMER
+		set ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @newArtiest)
+		where NUMMER_TITEL = @titel
+		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @oldArtiest);
+		
+		if not exists (select '' from NUMMER where ARTIEST_ID = @oldArtiest)
+		execute dbo.usp_Artiest_Delete @artiest = @oldArtiest
+		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  

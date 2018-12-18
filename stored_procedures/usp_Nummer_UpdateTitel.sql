@@ -1,8 +1,10 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_DeleteArtiest_Delete
-@artiest varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Nummer_UpdateTitel
+@oldTitel varchar(256),
+@artiest varchar(256),
+@newTitel varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -11,15 +13,23 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if not exists (select '' from ARTIEST where A_NAAM = @artiest)
-		throw 50105, 'De artiest bestaat niet.', 1
+		if (@oldTitel = @newTitel)
+		throw 50100, 'Er zijn geen veranderingen.', 1
+
+		IF NOT EXISTS	(	SELECT '' 
+							FROM NUMMER N 
+							INNER JOIN ARTIEST A 
+							ON N.ARTIEST_ID = A.ARTIEST_ID 
+							WHERE  NUMMER_TITEL = @oldTitel 
+							AND ARTIEST_NAAM = @artiest
+						)
+		throw 50106, 'Dit nummer bestaat niet.', 1
 		
-		if exists (select '' from NUMMER where A_NAAM = @artiest)
-		throw 50103, 'Er is nog een nummer gekoppeld aan deze artiest.', 1
-
-		delete from ARTIEST
-		where A_NAAM = @artiest
-
+		update NUMMER
+		set NUMMER_TITEL = @newTitel
+		where NUMMER_TITEL = @oldTitel
+		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @artiest);
+		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
