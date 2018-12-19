@@ -1,4 +1,4 @@
-CREATE OR ALTER PROCEDURE sp_verwerkStem (@E_ID INT, @mail VARCHAR(256), @naam VARCHAR(256), @weging INT, @titel VARCHAR(256), @artiest VARCHAR(256))
+CREATE OR ALTER PROCEDURE usp_Stem_InsertStem (@evenementnaam VARCHAR(256), @mail VARCHAR(256), @naam VARCHAR(256), @weging INT, @titel VARCHAR(256), @artiest VARCHAR(256))
 AS
 BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -16,11 +16,11 @@ BEGIN
 		IF NOT EXISTS(SELECT * FROM NUMMER WHERE TITEL = @titel AND A_NAAM = @artiest)
 				EXECUTE sp_AddNewNummer_insert @titel = @titel, @artiest = @artiest;
 
-		IF EXISTS(SELECT * FROM EVENEMENT WHERE E_ID = @E_ID AND E_DATUM < GETDATE())
+		IF EXISTS(SELECT * FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam AND E_DATUM < GETDATE())
 			THROW 50300, 'Het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
 
 		IF NOT EXISTS(SELECT * FROM STEMMER WHERE EMAILADRES = @mail)
-		INSERT INTO STEMMER (EMAILADRES, NAAM) VALUES (@mail, @naam)
+		INSERT INTO STEMMER (EMAILADRES, STEMMER_NAAM) VALUES (@mail, @naam)
 
 		IF EXISTS(SELECT * FROM STEM WHERE EMAILADRES = @mail AND E_ID = @E_ID AND WEGING = @weging)
 			THROW 50303, 'Er is al een stem met deze rang uitgebracht voor deze stemmer.', 1
@@ -28,7 +28,8 @@ BEGIN
 		IF EXISTS(SELECT '' FROM STEM S INNER JOIN NUMMER N ON S.N_ID = N.N_ID WHERE N.A_NAAM = @artiest AND N.TITEL = @titel AND S.E_ID = @E_ID AND S.EMAILADRES = @mail)
 			THROW 50304, 'Dit nummer is al eerder voorgekomen in de Top 5 inzending.', 1
 
-		INSERT INTO STEM (E_ID, EMAILADRES, WEGING, N_ID) VALUES(@E_ID, @mail, @weging, (SELECT N_ID FROM NUMMER WHERE TITEL = @titel AND A_NAAM = @artiest))
+		INSERT INTO STEM (EVENEMENT_ID, EMAILADRES, WEGING, NUMMER_ID) 
+		VALUES((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam), @mail, @weging, (SELECT NUMMER_ID FROM NUMMER WHERE TITEL = @titel AND A_NAAM = @artiest))
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
