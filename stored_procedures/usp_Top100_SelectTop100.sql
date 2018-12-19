@@ -1,7 +1,7 @@
 USE BANG;
 GO
 
-CREATE or ALTER PROCEDURE dbo.sp_GenereerArtiestGefilterdeTop100Lijst_select
+CREATE or ALTER PROCEDURE dbo.usp_Top100_SelectTop100
 	@EvenementNaam varchar(256),
 	@EvenementDatum date,
 	@Plaatsnaam varchar(1024),
@@ -15,16 +15,10 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		;WITH stemmen AS (
-			SELECT s1.E_ID, n1.TITEL, n1.A_NAAM, SUM(s1.WEGING) AS score,
-				row_number() over (partition by n1.A_NAAM ORDER BY n1.TITEL) AS RowNumber
+		SELECT n1.NUMMER_TITEL, A.A_NAAM, SUM(s1.WEGING) AS score
 		FROM NUMMER n1 RIGHT OUTER JOIN STEM s1
-		ON n1.N_ID = s1.N_ID
-		GROUP BY s1.E_ID, n1.TITEL, n1.A_NAAM
-		)
-		SELECT TITEL, A_NAAM, score
-		FROM stemmen
-		WHERE E_ID = (
+		ON n1.N_ID = s1.N_ID INNER JOIN ARTIEST A ON n1.ARTIEST_ID = A.ARTIEST_ID
+		WHERE s1.E_ID = (
 			SELECT E_ID
 			FROM EVENEMENT
 			WHERE E_NAAM = @EvenementNaam
@@ -33,8 +27,7 @@ BEGIN
 			AND ADRES = @Adres
 			AND HUISNUMMER = @Huisnummer
 			)
-		AND RowNumber = 1
-		GROUP BY TITEL, A_NAAM, score
+		GROUP BY n1.NUMMER_TITEL, A.A_NAAM
 		ORDER BY score DESC;
 
 		COMMIT TRANSACTION

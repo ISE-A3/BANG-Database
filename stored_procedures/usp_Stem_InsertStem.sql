@@ -13,8 +13,8 @@ BEGIN
 		IF (@artiest IS NULL)
 			THROW 50302, 'De artiest van een stem ontbreekt.', 1
 
-		IF NOT EXISTS(SELECT * FROM NUMMER WHERE TITEL = @titel AND A_NAAM = @artiest)
-				EXECUTE sp_AddNewNummer_insert @titel = @titel, @artiest = @artiest;
+		IF NOT EXISTS(SELECT * FROM NUMMER WHERE NUMMER_TITEL = @titel AND A_NAAM = @artiest)
+				EXECUTE usp_Nummer_Insert @titel = @titel, @artiest = @artiest;
 
 		IF EXISTS(SELECT * FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam AND E_DATUM < GETDATE())
 			THROW 50300, 'Het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
