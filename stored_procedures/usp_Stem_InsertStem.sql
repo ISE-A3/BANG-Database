@@ -7,29 +7,28 @@ BEGIN
 		SET TRANSACTION ISOLATION LEVEL SERIALIZABLE
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-		IF(@titel IS NULL)
-			THROW 50301, 'De titel van een stem ontbreekt.', 1
 
-		IF (@artiest IS NULL)
-			THROW 50302, 'De artiest van een stem ontbreekt.', 1
+			IF NOT EXISTS(SELECT * FROM NUMMER N INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID WHERE NUMMER_TITEL = @titel AND ARTIEST_NAAM = @artiest)
+					EXECUTE usp_Nummer_Insert @titel = @titel, @artiest = @artiest;
 
-		IF NOT EXISTS(SELECT * FROM NUMMER WHERE NUMMER_TITEL = @titel AND A_NAAM = @artiest)
-				EXECUTE usp_Nummer_Insert @titel = @titel, @artiest = @artiest;
+			IF EXISTS(SELECT * FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam AND EVENEMENT_DATUM < GETDATE())
+				THROW 50300, 'Het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
 
-		IF EXISTS(SELECT * FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam AND E_DATUM < GETDATE())
-			THROW 50300, 'Het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
+			IF NOT EXISTS(SELECT * FROM STEMMER WHERE EMAILADRES = @mail)
+			INSERT INTO STEMMER (EMAILADRES, STEMMER_NAAM) VALUES (@mail, @naam)
 
-		IF NOT EXISTS(SELECT * FROM STEMMER WHERE EMAILADRES = @mail)
-		INSERT INTO STEMMER (EMAILADRES, STEMMER_NAAM) VALUES (@mail, @naam)
+			IF EXISTS(SELECT * FROM STEM S INNER JOIN EVENEMENT E ON S.EVENEMENT_ID = E.EVENEMENT_ID WHERE EMAILADRES = @mail AND E.EVENEMENT_NAAM = @evenementnaam AND WEGING = @weging)
+				THROW 50303, 'Er is al een stem met deze rang uitgebracht voor deze stemmer.', 1
 
-		IF EXISTS(SELECT * FROM STEM WHERE EMAILADRES = @mail AND E_ID = @E_ID AND WEGING = @weging)
-			THROW 50303, 'Er is al een stem met deze rang uitgebracht voor deze stemmer.', 1
+			IF EXISTS(SELECT '' FROM STEM S INNER JOIN EVENEMENT E ON S.EVENEMENT_ID = E.EVENEMENT_ID INNER JOIN NUMMER N ON S.NUMMER_ID = N.NUMMER_ID
+					  INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID
+					  WHERE A.ARTIEST_NAAM = @artiest AND N.NUMMER_TITEL = @titel AND E.EVENEMENT_NAAM = @evenementnaam AND S.EMAILADRES = @mail)
+				THROW 50304, 'Dit nummer is al eerder voorgekomen in de Top 5 inzending.', 1
 
-		IF EXISTS(SELECT '' FROM STEM S INNER JOIN NUMMER N ON S.N_ID = N.N_ID WHERE N.A_NAAM = @artiest AND N.TITEL = @titel AND S.E_ID = @E_ID AND S.EMAILADRES = @mail)
-			THROW 50304, 'Dit nummer is al eerder voorgekomen in de Top 5 inzending.', 1
+			INSERT INTO STEM (EVENEMENT_ID, EMAILADRES, WEGING, NUMMER_ID) 
+			VALUES((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam), @mail, @weging, 
+				   (SELECT NUMMER_ID FROM NUMMER N INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID WHERE  NUMMER_TITEL = @titel AND ARTIEST_NAAM = @artiest))
 
-		INSERT INTO STEM (EVENEMENT_ID, EMAILADRES, WEGING, NUMMER_ID) 
-		VALUES((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam), @mail, @weging, (SELECT NUMMER_ID FROM NUMMER WHERE TITEL = @titel AND A_NAAM = @artiest))
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
@@ -63,3 +62,6 @@ INSERT INTO dbo.STEM VALUES(6, 'hallo', 5, 10)
 SELECT * FROM STEM
 ROLLBACK TRANSACTION
 */
+--DELETE FROM STEM
+--DELETE FROM NUMMER
+--DELETE FROM ARTIEST
