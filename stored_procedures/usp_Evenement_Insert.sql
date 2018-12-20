@@ -1,8 +1,17 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_DeleteArtiest_Delete
-@artiest varchar(256)
+/*
+INSERT EVENT
+*/
+
+CREATE or ALTER PROCEDURE dbo.usp_Evenement_Insert
+@EVENEMENT_NAAM varchar(256),
+@EVENEMENT_DATUM date,
+@LOCATIENAAM VARCHAR(256),
+@PLAATSNAAM varchar(256),
+@ADRES varchar(256),
+@HUISNUMMER int
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -10,16 +19,14 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-		
-		if not exists (select '' from ARTIEST where A_NAAM = @artiest)
-		throw 50105, 'De artiest bestaat niet.', 1
-		
-		if exists (select '' from NUMMER where A_NAAM = @artiest)
-		throw 50103, 'Er is nog een nummer gekoppeld aan deze artiest.', 1
 
-		delete from ARTIEST
-		where A_NAAM = @artiest
+		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER)
+			EXEC dbo.usp_Locatie_Insert @LOCATIENAAM = @LOCATIENAAM, @PLAATSNAAM = @PLAATSNAAM, @ADRES = @ADRES, @HUISNUMMER = @HUISNUMMER
 
+
+		INSERT INTO EVENEMENT(EVENEMENT_NAAM, EVENEMENT_DATUM, PLAATSNAAM, ADRES, HUISNUMMER)
+		VALUES (@EVENEMENT_NAAM, @EVENEMENT_DATUM, @PLAATSNAAM, @ADRES, @HUISNUMMER)
+		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  

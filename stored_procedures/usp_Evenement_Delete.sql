@@ -1,9 +1,12 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.sp_DeleteNummer_Delete
-@titel varchar(256),
-@artiest varchar(256)
+/*
+DELETE EVENT
+*/
+
+CREATE or ALTER PROCEDURE dbo.usp_Evenement_Delete
+@EVENEMENT_NAAM varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,15 +15,10 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if not exists (select '' from NUMMER where TITEL = @titel and A_NAAM = @artiest)
-		throw 50106, 'Dit nummer bestaat niet.', 1
-
-		delete from NUMMER
-		where TITEL = @titel
-		and A_NAAM = @artiest
-		
-		if not exists (select '' from NUMMER where A_NAAM = @artiest)
-		execute sp_DeleteArtiest_Delete @artiest = @artiest
+		IF EXISTS (SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
+			DELETE FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+		ELSE
+			THROW 50204, 'Het evenement bestaat niet', 1
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
