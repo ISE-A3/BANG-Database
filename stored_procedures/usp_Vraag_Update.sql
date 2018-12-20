@@ -1,7 +1,13 @@
 use BANG
 GO
 
+/*
+INSERT TOP 100
+*/
+
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Update
+@VRAAG_ID varchar(256) NOT NULL,
+@VRAAG_TITEL varchar(256) NOT NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -10,7 +16,13 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		--checks hier
+		--succes operatie hier
+		UPDATE VRAAG
+		SET VRAAG_TITEL = @VRAAG_TITEL
+		WHERE VRAAG_ID = @VRAAG_ID
 
+		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH

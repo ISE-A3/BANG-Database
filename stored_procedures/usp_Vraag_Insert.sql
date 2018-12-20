@@ -21,6 +21,7 @@ BEGIN
 						FROM VRAAG 
 						WHERE VRAAG_ID = @VRAAG_ID)
 			THROW 50400, 'Er bestaat al een vraag met dit vraag_id.', 1;
+		--succes operatie hier
 		ELSE
 			--Afvangen dat wanneer er niets is ingevuld in de front end, er wel iets wordt ingevuld in de database. (Eigenlijk moet dit de rondenaam zijn, maar dat is niet voor deze
 			--iteratie)
@@ -28,6 +29,7 @@ BEGIN
 			INSERT INTO VRAAG
 			VALUES(@VRAAG_ID, @VRAAG_TITEL)
 
+		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
