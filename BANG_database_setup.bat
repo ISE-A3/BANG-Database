@@ -23,3 +23,8 @@ for %%f in (.\stored_procedures\*.sql) do (
 	ECHO Creating stored procedure %%~f>> %OUTPUT%
 	%SQLCMD% -S %SERVER% -d %DB% -U %LOGIN% -P %PASSWORD% -i %%~f >> %OUTPUT%
 )
+
+ECHO Setting up user rights>> %OUTPUT%
+ECHO Setting up user rights
+
+%SQLCMD% -S %SERVER% -d %DB% -U %LOGIN% -P %PASSWORD% -i database_setup\BANG_userSetup.sql  >>%OUTPUT%
