@@ -1,9 +1,13 @@
 use BANG
 GO
 
+/*
+INSERT TOP 100
+*/
+
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert
-@Vraag varchar(256),
-@Thema varchar(256)
+@VRAAG_ID varchar(256) NOT NULL,
+@VRAAG_TITEL varchar(256) NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,11 +16,17 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		IF EXISTS(SELECT '' FROM VRAAG WHERE)
-			THROW 50220, '', 1
+		--checks hier
+		IF EXISTS	(	SELECT '' 
+						FROM VRAAG 
+						WHERE VRAAG_ID = @VRAAG_ID)
+			THROW 50400, 'Er bestaat al een vraag met dit vraag_id.', 1;
 		ELSE
+			--Afvangen dat wanneer er niets is ingevuld in de front end, er wel iets wordt ingevuld in de database. (Eigenlijk moet dit de rondenaam zijn, maar dat is niet voor deze
+			--iteratie)
+			--IF @VRAAG_TITEL = 'NULL'	(	SELECT @VRAAG_TITEL = 
 			INSERT INTO VRAAG
-			VALUES()
+			VALUES(@VRAAG_ID, @VRAAG_TITEL)
 
 		COMMIT TRANSACTION 
 	END TRY	  
