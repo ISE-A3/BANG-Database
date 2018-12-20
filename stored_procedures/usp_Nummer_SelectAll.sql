@@ -10,7 +10,7 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		select n.NUMMER_TITEL, a.ARTIEST_NAAM from NUMMER n inner join ARTIEST a on n.ARTIEST_ID = a.ARTIEST_ID;
+		select n.NUMMER_TITEL, a.ARTIEST_NAAM from NUMMER n inner join ARTIEST a on n.ARTIEST_ID = a.ARTIEST_ID order by n.NUMMER_TITEL;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

@@ -18,14 +18,27 @@ BEGIN
 							ON N.ARTIEST_ID = A.ARTIEST_ID 
 							WHERE  NUMMER_TITEL = @titel 
 							AND ARTIEST_NAAM = @artiest
-						)
+					  )
 		throw 50106, 'Dit nummer bestaat niet.', 1
+
+		if exists( SELECT ''
+				   FROM NUMMER N INNER JOIN STEM S ON N.NUMMER_ID = S.NUMMER_ID
+				   INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID
+				   WHERE N.NUMMER_TITEL = @titel
+				   AND A.ARTIEST_NAAM = @artiest
+				 )
+		 throw 50107, 'Dit nummer staat nog vast aan een stem in de Top 100.', 1
 
 		delete from NUMMER
 		where NUMMER_TITEL = @titel
 		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @artiest);
 		
-		if not exists (select '' from NUMMER where ARTIEST_ID = @artiest)
+		if not exists (	SELECT '' 
+							FROM NUMMER N 
+							INNER JOIN ARTIEST A 
+							ON N.ARTIEST_ID = A.ARTIEST_ID 
+							WHERE ARTIEST_NAAM = @artiest
+						)
 		execute usp_Artiest_Delete @artiest = @artiest;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
