@@ -3,8 +3,8 @@
 SET SQLCMD="SQLCMD.EXE"
 SET SERVER="localhost"
 SET DB="BANG"
-SET LOGIN="sa"
-SET PASSWORD="joost-fy2388"
+SET LOGIN="BANG_DBA"
+SET PASSWORD="L72)zdTQr&v$5n+M"
 SET OUTPUT="OutputLog.txt"
 
 ECHO %USERNAME% started the BANG unit test framework batch process at %TIME% - to file >> %OUTPUT%
