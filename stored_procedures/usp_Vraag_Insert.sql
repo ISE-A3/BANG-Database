@@ -2,7 +2,7 @@ use BANG
 GO
 
 /*
-INSERT TOP 100
+INSERT VRAAG
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert

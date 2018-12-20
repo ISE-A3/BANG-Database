@@ -1,7 +1,12 @@
 use BANG
 GO
 
+/*
+DELETE VRAAG
+*/
+
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Delete
+@VRAAG_ID varchar(256) NOT NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -10,14 +15,12 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		IF EXISTS (SELECT '' FROM VRAAG WHERE)
-			DELETE FROM VRAAGONDERDEEL
-			WHERE
+		--checks hier
+		--succes operatie hier
+		DELETE FROM VRAAG
+		WHERE VRAAG_ID = @VRAAG_ID
 
-			DELETE FROM VRAAGONDERDEEL
-			WHERE
-		ELSE
-			THROW 50221, '', 1
+		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
