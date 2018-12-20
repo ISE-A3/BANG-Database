@@ -36,7 +36,7 @@ BEGIN
 		where NUMMER_TITEL = @titel
 		and ARTIEST_ID = (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @oldArtiest);
 		
-		if not exists (select '' from NUMMER where ARTIEST_ID = @oldArtiest)
+		if not exists (select '' from NUMMER N INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID WHERE ARTIEST_NAAM = @oldArtiest)
 		execute dbo.usp_Artiest_Delete @artiest = @oldArtiest;
 		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
