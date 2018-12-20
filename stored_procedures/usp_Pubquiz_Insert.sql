@@ -6,8 +6,8 @@ INSERT PUBQUIZ
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Pubquiz_Insert
-@EVENEMENT_NAAM varchar(256),
-@PUBQUIZ_TITEL VARCHAR(256)
+	@EVENEMENT_NAAM varchar(256),
+	@PUBQUIZ_TITEL VARCHAR(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -25,9 +25,10 @@ BEGIN
 					)
 			THROW 50205, 'Er is al een pubquiz bij dit evenement', 1
 		ELSE
-			--succes operatie hier
-			INSERT INTO PUBQUIZ (EVENEMENT_ID, PUBQUIZ_TITEL)
-			VALUES ((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM), @PUBQUIZ_TITEL)
+
+		--succes operatie hier
+		INSERT INTO PUBQUIZ (EVENEMENT_ID, PUBQUIZ_TITEL)
+		VALUES ((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM), @PUBQUIZ_TITEL)
 
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
