@@ -1,4 +1,4 @@
-use BANG
+use BANG;
 go
 
 /*
