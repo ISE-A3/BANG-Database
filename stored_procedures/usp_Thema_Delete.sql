@@ -17,7 +17,7 @@ BEGIN
 			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij vragen.';
 			THROW 50215, @error, 1
 
-		IF EXISTS (SELECT '' FROM RONDE WHERE Thema = @thema)
+		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE Thema = @thema)
 			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij rondes.';
 			THROW 50214, @error, 1
 
