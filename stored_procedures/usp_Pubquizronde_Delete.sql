@@ -1,8 +1,9 @@
 use BANG
 GO
 
-CREATE or ALTER PROCEDURE dbo.usp_Thema_Delete
-@thema varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Pubquizronde_Delete
+@EVENEMENT_NAAM VARCHAR(256),
+@RONDE_NUMMER INT
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -11,25 +12,24 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		DECLARE @error varchar(1024)
+		IF NOT EXISTS(SELECT '' FROM PUBQUIZRONDE PR INNER JOIN EVENEMENT E ON PR.EVENEMENT_ID = E.EVENEMENT_ID
+				  WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM AND PR.RONDENUMMER = @RONDE_NUMMER)
+			THROW 50220, 'De ronde van dit evenement bestaat niet of is al verwijderd', 1
 
-		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @thema)
-			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij vragen.';
-			THROW 50215, @error, 1
+		IF NOT EXISTS(SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
+			THROW 50221, 'Het evenement met deze naam bestaat niet', 1
 
-		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE THEMA = @thema)
-			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij rondes.';
-			THROW 50214, @error, 1
+		IF EXISTS (
+            SELECT ''
+            FROM PUBQUIZRONDEVRAAG PRV
+            INNER JOIN EVENEMENT E 
+            ON PRV.EVENEMENT_ID = E.EVENEMENT_ID 
+            WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM AND PRV.RONDENUMMER = @RONDE_NUMMER
+           )
+		   EXEC usp_Pubquizrondevraag_Delete @EVENEMENT_NAAM = @EVENEMENT_NAAM, @RONDE_NUMMER = @RONDE_NUMMER
 
-		IF EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
-		BEGIN
-			DELETE FROM THEMA
-			WHERE Thema = @thema
-		END
-		ELSE
-			SET @error = 'Thema ' + @thema + ' kan niet verwijdered worden. Thema ' + @thema + ' bestaat niet.';
-			THROW 50213, @error, 1
-
+		DELETE FROM PUBQUIZRONDE
+		WHERE EVENEMENT_ID = (SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM) AND RONDENUMMER = @RONDE_NUMMER
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH

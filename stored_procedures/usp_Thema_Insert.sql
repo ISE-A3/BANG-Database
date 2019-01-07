@@ -12,16 +12,16 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		DECLARE @error varchar(1024)
+				
+		IF EXISTS (SELECT '' FROM THEMA WHERE THEMA = @thema)
+			BEGIN
+				SET @error = 'Thema ' + @thema + ' kan niet aangepast worden. Thema ' + @thema + ' bestaat al.';
+				THROW 50211, @error, 1
+			END
+		
 
-		IF EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
-		BEGIN
-			SET @error = 'Thema ' + @thema + ' kan niet toegevoegd worden. Thema ' + @thema + ' bestaat al.';
-			THROW 50210, @error, 1
-		END
-		ELSE
-			INSERT INTO THEMA(Thema)
-			VALUES(@thema)
-
+		INSERT INTO THEMA(THEMA)
+		VALUES(@thema)
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH

@@ -1,9 +1,9 @@
 use BANG
 GO
 
-CREATE or ALTER PROCEDURE dbo.usp_Thema_Update
-@themaOud varchar(256),
-@themaNieuw varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Pubquizrondevraag_Delete
+@EVENEMENT_NAAM VARCHAR(256),
+@RONDE_NUMMER INT
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,22 +12,15 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		DECLARE @error varchar(1024)
+		IF NOT EXISTS(SELECT '' FROM PUBQUIZRONDE PR INNER JOIN EVENEMENT E ON PR.EVENEMENT_ID = E.EVENEMENT_ID
+				  WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM AND PR.RONDENUMMER = @RONDE_NUMMER)
+			THROW 50230, 'De ronde van dit evenement bestaat niet of is al verwijderd', 1
 
-		IF NOT EXISTS (SELECT '' FROM THEMA WHERE Thema = @themaOud)
-			SET @error = 'Thema ' + @themaOud + ' kan niet aangepast worden. Thema ' + @themaOud + ' bestaat niet.';
-			THROW 50212, @error, 1
-				
-		IF EXISTS (SELECT '' FROM THEMA WHERE Thema = @themaNieuw)
-			BEGIN
-				SET @error = 'Thema ' + @themaOud + ' kan niet aangepast worden. Thema ' + @themaNieuw + ' bestaat al.';
-				THROW 50211, @error, 1
-			END
-			ELSE
-				UPDATE THEMA
-				SET Thema = @themaNieuw
-				WHERE Thema = @themaOud
+		IF NOT EXISTS(SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
+			THROW 50231, 'Het evenement met deze naam bestaat niet', 1
 
+		DELETE FROM PUBQUIZRONDEVRAAG
+		WHERE EVENEMENT_ID = (SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM) AND RONDENUMMER = @RONDE_NUMMER
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
