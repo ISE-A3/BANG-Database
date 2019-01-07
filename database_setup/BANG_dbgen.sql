@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     20-12-2018 10:49:10                          */
+/* Created on:     21-12-2018 13:15:33                          */
 /*==============================================================*/
 
 USE master
@@ -18,16 +18,16 @@ GO
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('EVENEMENT') and o.name = 'FK_EVENEMEN_EVENEMENT_LOCATIE')
-alter table EVENEMENT
-   drop constraint FK_EVENEMEN_EVENEMENT_LOCATIE
+   where r.fkeyid = object_id('ANTWOORD') and o.name = 'FK_ANTWOORD_ANTWOORD__VRAAGOND')
+alter table ANTWOORD
+   drop constraint FK_ANTWOORD_ANTWOORD__VRAAGOND
 go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('GESLOTENVRAAGONDERDEEL') and o.name = 'FK_GESLOTEN_INHERITAN_VRAAGOND')
-alter table GESLOTENVRAAGONDERDEEL
-   drop constraint FK_GESLOTEN_INHERITAN_VRAAGOND
+   where r.fkeyid = object_id('EVENEMENT') and o.name = 'FK_EVENEMEN_EVENEMENT_LOCATIE')
+alter table EVENEMENT
+   drop constraint FK_EVENEMEN_EVENEMENT_LOCATIE
 go
 
 if exists (select 1
@@ -49,6 +49,13 @@ if exists (select 1
    where r.fkeyid = object_id('PUBQUIZRONDE') and o.name = 'FK_PUBQUIZR_PUBQUIZRO_PUBQUIZ')
 alter table PUBQUIZRONDE
    drop constraint FK_PUBQUIZR_PUBQUIZRO_PUBQUIZ
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('PUBQUIZRONDE') and o.name = 'FK_PUBQUIZR_THEMA_VAN_THEMA')
+alter table PUBQUIZRONDE
+   drop constraint FK_PUBQUIZR_THEMA_VAN_THEMA
 go
 
 if exists (select 1
@@ -102,20 +109,6 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('THEMA_VAN_PUBQUIZRONDE') and o.name = 'FK_THEMA_VA_THEMA_VAN_THEMA')
-alter table THEMA_VAN_PUBQUIZRONDE
-   drop constraint FK_THEMA_VA_THEMA_VAN_THEMA
-go
-
-if exists (select 1
-   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
-   where r.fkeyid = object_id('THEMA_VAN_PUBQUIZRONDE') and o.name = 'FK_THEMA_VA_THEMA_VAN_PUBQUIZR')
-alter table THEMA_VAN_PUBQUIZRONDE
-   drop constraint FK_THEMA_VA_THEMA_VAN_PUBQUIZR
-go
-
-if exists (select 1
-   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('TOP100') and o.name = 'FK_TOP100_IS_EEN_EV_EVENEMEN')
 alter table TOP100
    drop constraint FK_TOP100_IS_EEN_EV_EVENEMEN
@@ -126,6 +119,22 @@ if exists (select 1
    where r.fkeyid = object_id('VRAAGONDERDEEL') and o.name = 'FK_VRAAGOND_VRAAGONDE_VRAAG')
 alter table VRAAGONDERDEEL
    drop constraint FK_VRAAGOND_VRAAGONDE_VRAAG
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('ANTWOORD')
+            and   name  = 'ANTWOORD_BIJ_VRAAG_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index ANTWOORD.ANTWOORD_BIJ_VRAAG_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('ANTWOORD')
+            and   type = 'U')
+   drop table ANTWOORD
 go
 
 if exists (select 1
@@ -149,22 +158,6 @@ if exists (select 1
            where  id = object_id('EVENEMENT')
             and   type = 'U')
    drop table EVENEMENT
-go
-
-if exists (select 1
-            from  sysindexes
-           where  id    = object_id('GESLOTENVRAAGONDERDEEL')
-            and   name  = 'INHERITANCE_2_FK'
-            and   indid > 0
-            and   indid < 255)
-   drop index GESLOTENVRAAGONDERDEEL.INHERITANCE_2_FK
-go
-
-if exists (select 1
-            from  sysobjects
-           where  id = object_id('GESLOTENVRAAGONDERDEEL')
-            and   type = 'U')
-   drop table GESLOTENVRAAGONDERDEEL
 go
 
 if exists (select 1
@@ -195,6 +188,15 @@ if exists (select 1
            where  id = object_id('PUBQUIZ')
             and   type = 'U')
    drop table PUBQUIZ
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('PUBQUIZRONDE')
+            and   name  = 'THEMA_VAN_PUBQUIZRONDE_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index PUBQUIZRONDE.THEMA_VAN_PUBQUIZRONDE_FK
 go
 
 if exists (select 1
@@ -312,31 +314,6 @@ if exists (select 1
 go
 
 if exists (select 1
-            from  sysindexes
-           where  id    = object_id('THEMA_VAN_PUBQUIZRONDE')
-            and   name  = 'THEMA_VAN_PUBQUIZRONDE2_FK'
-            and   indid > 0
-            and   indid < 255)
-   drop index THEMA_VAN_PUBQUIZRONDE.THEMA_VAN_PUBQUIZRONDE2_FK
-go
-
-if exists (select 1
-            from  sysindexes
-           where  id    = object_id('THEMA_VAN_PUBQUIZRONDE')
-            and   name  = 'THEMA_VAN_PUBQUIZRONDE_FK'
-            and   indid > 0
-            and   indid < 255)
-   drop index THEMA_VAN_PUBQUIZRONDE.THEMA_VAN_PUBQUIZRONDE_FK
-go
-
-if exists (select 1
-            from  sysobjects
-           where  id = object_id('THEMA_VAN_PUBQUIZRONDE')
-            and   type = 'U')
-   drop table THEMA_VAN_PUBQUIZRONDE
-go
-
-if exists (select 1
             from  sysobjects
            where  id = object_id('TOP100')
             and   type = 'U')
@@ -430,16 +407,19 @@ if exists(select 1 from systypes where name='VRAAGSOORT')
    drop type VRAAGSOORT
 go
 
-if exists(select 1 from systypes where name='VRAAG_ID')
-   drop type VRAAG_ID
-go
-
 if exists(select 1 from systypes where name='WEGING')
    execute sp_unbindrule WEGING
 go
 
 if exists(select 1 from systypes where name='WEGING')
    drop type WEGING
+go
+
+if exists (select 1
+   from  sysobjects where type = 'D'
+   and name = 'D_'
+   )
+   drop default D_
 go
 
 if exists (select 1 from sysobjects where id=object_id('R_VRAAGSOORT') and type='R')
@@ -456,6 +436,13 @@ go
 
 create rule R_WEGING as
       @column between 1 and 5
+go
+
+/*==============================================================*/
+/* Default: D_                                                  */
+/*==============================================================*/
+create default D_
+    as ''
 go
 
 /*==============================================================*/
@@ -498,6 +485,9 @@ go
 /*==============================================================*/
 create type HUISNUMMER_TOEVOEGING
    from char(1)
+go
+
+execute sp_bindefault D_, 'HUISNUMMER_TOEVOEGING'
 go
 
 /*==============================================================*/
@@ -567,13 +557,6 @@ execute sp_bindrule R_VRAAGSOORT, VRAAGSOORT
 go
 
 /*==============================================================*/
-/* Domain: VRAAG_ID                                             */
-/*==============================================================*/
-create type VRAAG_ID
-   from int
-go
-
-/*==============================================================*/
 /* Domain: WEGING                                               */
 /*==============================================================*/
 create type WEGING
@@ -584,10 +567,31 @@ execute sp_bindrule R_WEGING, WEGING
 go
 
 /*==============================================================*/
+/* Table: ANTWOORD                                              */
+/*==============================================================*/
+create table ANTWOORD (
+   ANTWOORD_ID          SURROGATE_KEY        not null,
+   VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
+   ANTWOORD             ANTWOORD             not null,
+   PUNTEN               PUNTEN               not null,
+   constraint PK_ANTWOORD primary key nonclustered (ANTWOORD_ID),
+   constraint AK_NATURAL_ANTWOORD unique (ANTWOORD, VRAAGONDERDEEL_ID)
+)
+go
+
+/*==============================================================*/
+/* Index: ANTWOORD_BIJ_VRAAG_FK                                 */
+/*==============================================================*/
+create index ANTWOORD_BIJ_VRAAG_FK on ANTWOORD (
+VRAAGONDERDEEL_ID ASC
+)
+go
+
+/*==============================================================*/
 /* Table: ARTIEST                                               */
 /*==============================================================*/
 create table ARTIEST (
-   ARTIEST_ID           SURROGATE_KEY        identity,
+   ARTIEST_ID           SURROGATE_KEY        not null,
    ARTIEST_NAAM         NAAM                 not null,
    constraint PK_ARTIEST primary key nonclustered (ARTIEST_ID),
    constraint AK_NATURAL_ARTIEST unique (ARTIEST_NAAM)
@@ -600,10 +604,11 @@ go
 create table EVENEMENT (
    EVENEMENT_NAAM       NAAM                 not null,
    EVENEMENT_DATUM      DATUM                not null,
-   EVENEMENT_ID         SURROGATE_KEY        identity,
+   EVENEMENT_ID         SURROGATE_KEY        not null,
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
+   HUISNUMMER_TOEVOEGING HUISNUMMER_TOEVOEGING not null,
    constraint PK_EVENEMENT primary key nonclustered (EVENEMENT_ID),
    constraint AK_NATURAL_EVENEMENT unique (EVENEMENT_NAAM)
 )
@@ -615,31 +620,8 @@ go
 create index EVENEMENT_OP_LOCATIE_FK on EVENEMENT (
 PLAATSNAAM ASC,
 ADRES ASC,
-HUISNUMMER ASC
-)
-go
-
-/*==============================================================*/
-/* Table: GESLOTENVRAAGONDERDEEL                                */
-/*==============================================================*/
-create table GESLOTENVRAAGONDERDEEL (
-   VRAAG_ID             VRAAG_ID             not null,
-   VRAAGONDERDEEL       QUIZVRAAG            not null,
-   ANTWOORD             ANTWOORD             not null,
-   ANTWOORD_OPTIE       ANTWOORD             not null,
-   VRAAGSOORT           VRAAGSOORT           not null,
-   AANTAL_PUNTEN        PUNTEN               not null,
-   constraint PK_GESLOTENVRAAGONDERDEEL primary key nonclustered (VRAAG_ID, VRAAGONDERDEEL, ANTWOORD, ANTWOORD_OPTIE)
-)
-go
-
-/*==============================================================*/
-/* Index: INHERITANCE_2_FK                                      */
-/*==============================================================*/
-create index INHERITANCE_2_FK on GESLOTENVRAAGONDERDEEL (
-VRAAG_ID ASC,
-VRAAGONDERDEEL ASC,
-ANTWOORD ASC
+HUISNUMMER ASC,
+HUISNUMMER_TOEVOEGING ASC
 )
 go
 
@@ -651,8 +633,8 @@ create table LOCATIE (
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
-   HUISNUMMER_TOEVOEGING HUISNUMMER_TOEVOEGING null,
-   constraint PK_LOCATIE primary key nonclustered (PLAATSNAAM, ADRES, HUISNUMMER)
+   HUISNUMMER_TOEVOEGING HUISNUMMER_TOEVOEGING not null,
+   constraint PK_LOCATIE primary key nonclustered (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
 )
 go
 
@@ -660,11 +642,11 @@ go
 /* Table: NUMMER                                                */
 /*==============================================================*/
 create table NUMMER (
-   NUMMER_ID            SURROGATE_KEY        identity,
+   NUMMER_ID            SURROGATE_KEY        not null,
    ARTIEST_ID           SURROGATE_KEY        not null,
    NUMMER_TITEL         NAAM                 not null,
    constraint PK_NUMMER primary key nonclustered (NUMMER_ID),
-   constraint AK_NATURAL_NUMMER unique (NUMMER_TITEL)
+   constraint AK_NATURAL_NUMMER unique (NUMMER_TITEL, ARTIEST_ID)
 )
 go
 
@@ -691,9 +673,10 @@ go
 /*==============================================================*/
 create table PUBQUIZRONDE (
    EVENEMENT_ID         SURROGATE_KEY        not null,
-   RONDENR              VOLGNUMMER           not null,
+   RONDENUMMER          VOLGNUMMER           not null,
+   THEMA                THEMA                not null,
    RONDENAAM            NAAM                 null,
-   constraint PK_PUBQUIZRONDE primary key nonclustered (EVENEMENT_ID, RONDENR)
+   constraint PK_PUBQUIZRONDE primary key nonclustered (EVENEMENT_ID, RONDENUMMER)
 )
 go
 
@@ -706,14 +689,22 @@ EVENEMENT_ID ASC
 go
 
 /*==============================================================*/
+/* Index: THEMA_VAN_PUBQUIZRONDE_FK                             */
+/*==============================================================*/
+create index THEMA_VAN_PUBQUIZRONDE_FK on PUBQUIZRONDE (
+THEMA ASC
+)
+go
+
+/*==============================================================*/
 /* Table: PUBQUIZRONDEVRAAG                                     */
 /*==============================================================*/
 create table PUBQUIZRONDEVRAAG (
    EVENEMENT_ID         SURROGATE_KEY        not null,
-   RONDENR              VOLGNUMMER           not null,
-   VRAAG_ID             VRAAG_ID             not null,
-   VRAAGNR              VOLGNUMMER           not null,
-   constraint PK_PUBQUIZRONDEVRAAG primary key nonclustered (EVENEMENT_ID, RONDENR, VRAAG_ID, VRAAGNR)
+   RONDENUMMER          VOLGNUMMER           not null,
+   VRAAG_ID             SURROGATE_KEY        not null,
+   VRAAGNUMMER          VOLGNUMMER           not null,
+   constraint PK_PUBQUIZRONDEVRAAG primary key nonclustered (EVENEMENT_ID, RONDENUMMER, VRAAG_ID, VRAAGNUMMER)
 )
 go
 
@@ -722,7 +713,7 @@ go
 /*==============================================================*/
 create index PUBQUIZRONDEVRAAG_VAN_PUBQUIZRONDE_FK on PUBQUIZRONDEVRAAG (
 EVENEMENT_ID ASC,
-RONDENR ASC
+RONDENUMMER ASC
 )
 go
 
@@ -793,7 +784,7 @@ go
 /* Table: THEMA_BIJ_VRAAG                                       */
 /*==============================================================*/
 create table THEMA_BIJ_VRAAG (
-   VRAAG_ID             VRAAG_ID             not null,
+   VRAAG_ID             SURROGATE_KEY        not null,
    THEMA                THEMA                not null,
    constraint PK_THEMA_BIJ_VRAAG primary key (VRAAG_ID, THEMA)
 )
@@ -816,34 +807,6 @@ THEMA ASC
 go
 
 /*==============================================================*/
-/* Table: THEMA_VAN_PUBQUIZRONDE                                */
-/*==============================================================*/
-create table THEMA_VAN_PUBQUIZRONDE (
-   THEMA                THEMA                not null,
-   EVENEMENT_ID         SURROGATE_KEY        not null,
-   RONDENR              VOLGNUMMER           not null,
-   constraint PK_THEMA_VAN_PUBQUIZRONDE primary key (EVENEMENT_ID, THEMA, RONDENR)
-)
-go
-
-/*==============================================================*/
-/* Index: THEMA_VAN_PUBQUIZRONDE_FK                             */
-/*==============================================================*/
-create index THEMA_VAN_PUBQUIZRONDE_FK on THEMA_VAN_PUBQUIZRONDE (
-THEMA ASC
-)
-go
-
-/*==============================================================*/
-/* Index: THEMA_VAN_PUBQUIZRONDE2_FK                            */
-/*==============================================================*/
-create index THEMA_VAN_PUBQUIZRONDE2_FK on THEMA_VAN_PUBQUIZRONDE (
-EVENEMENT_ID ASC,
-RONDENR ASC
-)
-go
-
-/*==============================================================*/
 /* Table: TOP100                                                */
 /*==============================================================*/
 create table TOP100 (
@@ -858,9 +821,11 @@ go
 /* Table: VRAAG                                                 */
 /*==============================================================*/
 create table VRAAG (
-   VRAAG_ID             VRAAG_ID             identity,
+   VRAAG_ID             SURROGATE_KEY        not null,
+   VRAAG_NAAM           NAAM                 not null,
    VRAAG_TITEL          NAAM                 null,
-   constraint PK_VRAAG primary key nonclustered (VRAAG_ID)
+   constraint PK_VRAAG primary key nonclustered (VRAAG_ID),
+   constraint AK_NATURAL_VRAAG unique (VRAAG_NAAM)
 )
 go
 
@@ -868,12 +833,13 @@ go
 /* Table: VRAAGONDERDEEL                                        */
 /*==============================================================*/
 create table VRAAGONDERDEEL (
-   VRAAG_ID             VRAAG_ID             not null,
+   VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
+   VRAAG_ID             SURROGATE_KEY        not null,
+   VRAAGONDERDEELNUMMER VOLGNUMMER           not null,
    VRAAGONDERDEEL       QUIZVRAAG            not null,
-   ANTWOORD             ANTWOORD             not null,
    VRAAGSOORT           VRAAGSOORT           not null,
-   AANTAL_PUNTEN        PUNTEN               not null,
-   constraint PK_VRAAGONDERDEEL primary key nonclustered (VRAAG_ID, VRAAGONDERDEEL, ANTWOORD)
+   constraint PK_VRAAGONDERDEEL primary key nonclustered (VRAAGONDERDEEL_ID),
+   constraint AK_NATURAL_VRAAGOND unique (VRAAGONDERDEELNUMMER, VRAAG_ID)
 )
 go
 
@@ -885,18 +851,18 @@ VRAAG_ID ASC
 )
 go
 
-alter table EVENEMENT
-   add constraint FK_EVENEMENT_EVENEMENT_LOCATIE foreign key (PLAATSNAAM, ADRES, HUISNUMMER)
-      references LOCATIE (PLAATSNAAM, ADRES, HUISNUMMER)
+alter table ANTWOORD
+   add constraint FK_ANTWOORD_BIJ__VRAAGONDERDEEL foreign key (VRAAGONDERDEEL_ID)
+      references VRAAGONDERDEEL (VRAAGONDERDEEL_ID)
 go
 
-alter table GESLOTENVRAAGONDERDEEL
-   add constraint FK_GESLOTEN_INHERITANCE_VRAAGONDERDEEL foreign key (VRAAG_ID, VRAAGONDERDEEL, ANTWOORD)
-      references VRAAGONDERDEEL (VRAAG_ID, VRAAGONDERDEEL, ANTWOORD)
+alter table EVENEMENT
+   add constraint FK_EVENEMENT_OP_LOCATIE foreign key (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
+      references LOCATIE (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
 go
 
 alter table NUMMER
-   add constraint FK_NUMMER_NUMMER_VAN_ARTIEST foreign key (ARTIEST_ID)
+   add constraint FK_NUMMER_VAN_ARTIEST foreign key (ARTIEST_ID)
       references ARTIEST (ARTIEST_ID)
 go
 
@@ -910,18 +876,23 @@ alter table PUBQUIZRONDE
       references PUBQUIZ (EVENEMENT_ID)
 go
 
-alter table PUBQUIZRONDEVRAAG
-   add constraint FK_PUBQUIZRONDEVRAAG_VAN_PUBQUIZRONDE foreign key (EVENEMENT_ID, RONDENR)
-      references PUBQUIZRONDE (EVENEMENT_ID, RONDENR)
+alter table PUBQUIZRONDE
+   add constraint FK_PUBQUIZRONDE_MET_THEMA foreign key (THEMA)
+      references THEMA (THEMA)
 go
 
 alter table PUBQUIZRONDEVRAAG
-   add constraint FK_PUBQUIZRONDEVRAAG_IS_VRAAG foreign key (VRAAG_ID)
+   add constraint FK_VRAAG_UIT_PUBQUIZROONDEVRAAG_IN_PUBQUIZ foreign key (EVENEMENT_ID, RONDENUMMER)
+      references PUBQUIZRONDE (EVENEMENT_ID, RONDENUMMER)
+go
+
+alter table PUBQUIZRONDEVRAAG
+   add constraint FK_VRAAG_VOOR_PUBQUIZRONDEVRAAG_PUBQUIZRONDE foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 
 alter table STEM
-   add constraint FK_NUMMER_IN_STEM foreign key (NUMMER_ID)
+   add constraint FK_STEM_VOOR_NUMMER foreign key (NUMMER_ID)
       references NUMMER (NUMMER_ID)
 go
 
@@ -936,23 +907,13 @@ alter table STEM
 go
 
 alter table THEMA_BIJ_VRAAG
-   add constraint FK_THEMA_BIJ_VRAAG_UIT_THEMA foreign key (VRAAG_ID)
+   add constraint FK_THEMA_UIT_THEMA_BIJ_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 
 alter table THEMA_BIJ_VRAAG
-   add constraint FK_THEMA_UIT_THEMA_BIJ_VRAAG foreign key (THEMA)
+   add constraint FK_THEMA_VOOR_VRAAG_UIT_THEMA foreign key (THEMA)
       references THEMA (THEMA)
-go
-
-alter table THEMA_VAN_PUBQUIZRONDE
-   add constraint FK_THEMA_UIT_THEMA_BIJ_PUBQUIZRONDE foreign key (THEMA)
-      references THEMA (THEMA)
-go
-
-alter table THEMA_VAN_PUBQUIZRONDE
-   add constraint FK_THEMA_BIJ_PUBQUIZRONDE_UIT_THEMA foreign key (EVENEMENT_ID, RONDENR)
-      references PUBQUIZRONDE (EVENEMENT_ID, RONDENR)
 go
 
 alter table TOP100
@@ -961,7 +922,7 @@ alter table TOP100
 go
 
 alter table VRAAGONDERDEEL
-   add constraint FK_VRAAGONDERDEEL_BIJ_VRAAG foreign key (VRAAG_ID)
+   add constraint FK_VRAAGONDERDEEL_VAN_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 
