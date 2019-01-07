@@ -1,14 +1,10 @@
-use BANG
+USE BANG
 GO
 
-/*
-UPDATE VRAAG
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Vraag_Update
-@VRAAG_ID varchar(256) NOT NULL,
-@VRAAG_NAAM varchar (256) NOT NULL,
-@VRAAG_TITEL varchar(256) NULL
+CREATE OR ALTER PROCEDURE dbo.usp_Thema_Bij_Vraag_Update
+@VRAAG_NAAM varchar(256) NOT NULL,
+@THEMA_HUIDIG varchar(256) NOT NULL,
+@THEMA_NIEUW varchar(256) NOT NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -17,18 +13,38 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		--checks hier
-		--succes operatie hier
+		DECLARE @VRAAG_ID int = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_ID = @VRAAG_ID)
-			IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			 THROW 50222, 'Deze vraagnaam is al in gebruik.', 1
+			IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_NIEUW)
+				THROW 50223, 'De vraag heeft dit thema al,', 1
 			ELSE
-				UPDATE VRAAG
-				SET VRAAG_TITEL = @VRAAG_TITEL, VRAAG_NAAM = @VRAAG_NAAM
-				WHERE VRAAG_ID = @VRAAG_ID
+				IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_HUIDIG)
+				BEGIN
+					IF NOT EXISTS (SELECT '' FROM THEMA WHERE THEMA = @THEMA_NIEUW)
+					BEGIN
+							EXEC dbo.usp_Thema_Insert @THEMA_NIEUW
+					END
+
+					UPDATE THEMA_BIJ_VRAAG
+					SET THEMA = @THEMA_NIEUW
+					WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_HUIDIG
+				END
+				ELSE
+				THROW 50225, 'De vraag heeft niet dit thema. Deze wijziging kan niet worden uitgevoerd.', 1
 		ELSE
-			THROW 50221, 'Deze vraag bestaat niet.', 1
-		
+			THROW 50224, 'De vraag heeft geen thema(''s).', 1
+
+		BEGIN
+			IF NOT EXISTS (SELECT '' FROM THEMA WHERE THEMA = @THEMA)
+			BEGIN
+				EXEC dbo.usp_Thema_Insert @Thema
+			END
+
+			INSERT INTO THEMA_BIJ_VRAAG(VRAAG_ID, THEMA)
+			VALUES (@VRAAG_ID, @THEMA)
+		END
+			
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  

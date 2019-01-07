@@ -17,8 +17,11 @@ BEGIN
 
 		--checks hier
 		--succes operatie hier
-		DELETE FROM VRAAG
-		WHERE VRAAG_ID = @VRAAG_ID
+		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_ID = @VRAAG_ID)
+			DELETE FROM VRAAG
+			WHERE VRAAG_ID = @VRAAG_ID
+		ELSE
+			THROW 50221, 'Deze vraag bestaat niet.', 1
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

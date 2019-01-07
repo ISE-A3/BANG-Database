@@ -1,14 +1,9 @@
-use BANG
+USE BANG
 GO
 
-/*
-UPDATE VRAAG
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Vraag_Update
-@VRAAG_ID varchar(256) NOT NULL,
-@VRAAG_NAAM varchar (256) NOT NULL,
-@VRAAG_TITEL varchar(256) NULL
+CREATE OR ALTER PROCEDURE dbo.usp_Thema_Bij_Vraag_Delete
+@VRAAG_NAAM varchar(256) NOT NULL,
+@THEMA varchar(256) NOT NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -17,18 +12,20 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		--checks hier
-		--succes operatie hier
-		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_ID = @VRAAG_ID)
-			IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			 THROW 50222, 'Deze vraagnaam is al in gebruik.', 1
+		DECLARE @VRAAG_ID int = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+
+		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID)
+			IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA)
+				DELETE FROM THEMA_BIJ_VRAAG
+				WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA 
 			ELSE
-				UPDATE VRAAG
-				SET VRAAG_TITEL = @VRAAG_TITEL, VRAAG_NAAM = @VRAAG_NAAM
-				WHERE VRAAG_ID = @VRAAG_ID
-		ELSE
-			THROW 50221, 'Deze vraag bestaat niet.', 1
+				THROW 50226, 'Het thema bij de vraag kan niet verwijderd worden, want de vraag heeft dit thema niet.', 1
+		ELSE 
+			THROW 50224, 'De vraag heeft geen thema(''s).', 1
+
 		
+			
+			
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
