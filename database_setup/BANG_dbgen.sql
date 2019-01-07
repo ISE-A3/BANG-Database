@@ -570,7 +570,7 @@ go
 /* Table: ANTWOORD                                              */
 /*==============================================================*/
 create table ANTWOORD (
-   ANTWOORD_ID          SURROGATE_KEY        not null,
+   ANTWOORD_ID          SURROGATE_KEY        identity,
    VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
    ANTWOORD             ANTWOORD             not null,
    PUNTEN               PUNTEN               not null,
@@ -591,7 +591,7 @@ go
 /* Table: ARTIEST                                               */
 /*==============================================================*/
 create table ARTIEST (
-   ARTIEST_ID           SURROGATE_KEY        not null,
+   ARTIEST_ID           SURROGATE_KEY        identity,
    ARTIEST_NAAM         NAAM                 not null,
    constraint PK_ARTIEST primary key nonclustered (ARTIEST_ID),
    constraint AK_NATURAL_ARTIEST unique (ARTIEST_NAAM)
@@ -604,7 +604,7 @@ go
 create table EVENEMENT (
    EVENEMENT_NAAM       NAAM                 not null,
    EVENEMENT_DATUM      DATUM                not null,
-   EVENEMENT_ID         SURROGATE_KEY        not null,
+   EVENEMENT_ID         SURROGATE_KEY        identity,
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
@@ -642,7 +642,7 @@ go
 /* Table: NUMMER                                                */
 /*==============================================================*/
 create table NUMMER (
-   NUMMER_ID            SURROGATE_KEY        not null,
+   NUMMER_ID            SURROGATE_KEY        identity,
    ARTIEST_ID           SURROGATE_KEY        not null,
    NUMMER_TITEL         NAAM                 not null,
    constraint PK_NUMMER primary key nonclustered (NUMMER_ID),
@@ -821,7 +821,7 @@ go
 /* Table: VRAAG                                                 */
 /*==============================================================*/
 create table VRAAG (
-   VRAAG_ID             SURROGATE_KEY        not null,
+   VRAAG_ID             SURROGATE_KEY        identity,
    VRAAG_NAAM           NAAM                 not null,
    VRAAG_TITEL          NAAM                 null,
    constraint PK_VRAAG primary key nonclustered (VRAAG_ID),
@@ -833,7 +833,7 @@ go
 /* Table: VRAAGONDERDEEL                                        */
 /*==============================================================*/
 create table VRAAGONDERDEEL (
-   VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
+   VRAAGONDERDEEL_ID    SURROGATE_KEY        identity,
    VRAAG_ID             SURROGATE_KEY        not null,
    VRAAGONDERDEELNUMMER VOLGNUMMER           not null,
    VRAAGONDERDEEL       QUIZVRAAG            not null,
@@ -925,4 +925,3 @@ alter table VRAAGONDERDEEL
    add constraint FK_VRAAGONDERDEEL_VAN_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
-
