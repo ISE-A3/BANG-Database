@@ -29,6 +29,9 @@ BEGIN
 					UPDATE THEMA_BIJ_VRAAG
 					SET THEMA = @THEMA_NIEUW
 					WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_HUIDIG
+
+					IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @THEMA_HUIDIG)
+						EXEC dbo.usp_Thema_Delete @THEMA_HUIDIG
 				END
 				ELSE
 				THROW 50225, 'De vraag heeft niet dit thema. Deze wijziging kan niet worden uitgevoerd.', 1
