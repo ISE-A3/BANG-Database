@@ -20,17 +20,11 @@ BEGIN
 			ON P.EVENEMENT_ID = E.EVENEMENT_ID 
 			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 			)
-			THROW 50205, 'Er bestaat geen pubquiz voor dit evenement', 1
+			THROW 50206, 'Er bestaat geen pubquiz voor dit evenement', 1
 		ELSE
 
 		--succes operatie hier
-		UPDATE PUBQUIZ
-		SET PUBQUIZ_TITEL = @NIEUWE_PUBQUIZ_TITEL
-		WHERE EVENEMENT_ID = (
-			SELECT EVENEMENT_ID
-			FROM EVENEMENT
-			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
-			)
+		DELETE
 
 		COMMIT TRANSACTION
 	END TRY

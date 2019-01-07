@@ -20,7 +20,7 @@ BEGIN
 			ON P.EVENEMENT_ID = E.EVENEMENT_ID 
 			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 			)
-			THROW 50205, 'Er bestaat geen pubquiz voor dit evenement', 1
+			THROW 50206, 'Er bestaat geen pubquiz voor dit evenement', 1
 		ELSE
 
 		--succes operatie hier
