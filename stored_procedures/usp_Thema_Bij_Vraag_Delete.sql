@@ -18,14 +18,14 @@ BEGIN
 			IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA)
 				DELETE FROM THEMA_BIJ_VRAAG
 				WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA 
+
+				IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @THEMA)
+					EXEC dbo.usp_Thema_Delete @THEMA
 			ELSE
 				THROW 50226, 'Het thema bij de vraag kan niet verwijderd worden, want de vraag heeft dit thema niet.', 1
 		ELSE 
 			THROW 50224, 'De vraag heeft geen thema(''s).', 1
 
-		
-			
-			
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
