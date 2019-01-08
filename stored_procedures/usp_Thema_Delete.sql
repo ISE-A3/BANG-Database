@@ -1,16 +1,8 @@
 use BANG
-go
+GO
 
-/*
-INSERT LOCATIE
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Locatie_Insert
-@LOCATIENAAM varchar(256),
-@PLAATSNAAM varchar(256),
-@ADRES varchar(256),
-@HUISNUMMER int,
-@HUISNUMMER_TOEVOEGING char(1)
+CREATE or ALTER PROCEDURE dbo.usp_Thema_Delete
+@thema varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -18,13 +10,26 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-		
-		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER AND HUISNUMMER_TOEVOEGING = @HUISNUMMER_TOEVOEGING)
-			INSERT INTO LOCATIE
-			VALUES (@LOCATIENAAM, @PLAATSNAAM, @ADRES, @HUISNUMMER, @HUISNUMMER_TOEVOEGING)
 
+		DECLARE @error varchar(1024)
 
-		--als flow tot dit punt komt transactie counter met 1 verlagen
+		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @thema)
+			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij vragen.';
+			THROW 50215, @error, 1
+
+		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE THEMA = @thema)
+			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij rondes.';
+			THROW 50214, @error, 1
+
+		IF EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
+		BEGIN
+			DELETE FROM THEMA
+			WHERE Thema = @thema
+		END
+		ELSE
+			SET @error = 'Thema ' + @thema + ' kan niet verwijdered worden. Thema ' + @thema + ' bestaat niet.';
+			THROW 50213, @error, 1
+
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
