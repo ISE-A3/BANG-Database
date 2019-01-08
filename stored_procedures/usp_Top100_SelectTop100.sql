@@ -1,7 +1,7 @@
 USE BANG;
 GO
 
-CREATE or ALTER PROCEDURE dbo.sp_GenereerOngefilterdeTop100Lijst_select
+CREATE or ALTER PROCEDURE dbo.usp_Top100_SelectTop100
 	@EvenementNaam varchar(256),
 	@EvenementDatum date,
 	@Plaatsnaam varchar(1024),
@@ -15,19 +15,19 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		SELECT n1.TITEL, n1.A_NAAM, SUM(s1.WEGING) AS score
+		SELECT n1.NUMMER_TITEL, A.ARTIEST_NAAM, SUM(s1.WEGING) AS score
 		FROM NUMMER n1 RIGHT OUTER JOIN STEM s1
-		ON n1.N_ID = s1.N_ID
-		WHERE s1.E_ID = (
-			SELECT E_ID
+		ON n1.NUMMER_ID = s1.NUMMER_ID INNER JOIN ARTIEST A ON n1.ARTIEST_ID = A.ARTIEST_ID
+		WHERE s1.EVENEMENT_ID = (
+			SELECT EVENEMENT_ID
 			FROM EVENEMENT
-			WHERE E_NAAM = @EvenementNaam
-			AND E_DATUM = @EvenementDatum
+			WHERE EVENEMENT_NAAM = @EvenementNaam
+			AND EVENEMENT_DATUM = @EvenementDatum
 			AND PLAATSNAAM = @Plaatsnaam
 			AND ADRES = @Adres
 			AND HUISNUMMER = @Huisnummer
 			)
-		GROUP BY n1.TITEL, n1.A_NAAM
+		GROUP BY n1.NUMMER_TITEL, A.ARTIEST_NAAM
 		ORDER BY score DESC;
 
 		COMMIT TRANSACTION
