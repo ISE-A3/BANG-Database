@@ -11,24 +11,17 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		DECLARE @error varchar(1024)
-
 		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @thema)
-			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij vragen.';
-			THROW 50215, @error, 1
+			THROW 50215, 'Thema kan niet verwijderd worden. Thema wordt gebruikt bij vragen', 1
 
 		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE THEMA = @thema)
-			SET @error = 'Thema ' + @thema + ' kan niet verwijderd worden. Thema ' + @thema + ' wordt nog gebruikt bij rondes.';
-			THROW 50214, @error, 1
+			THROW 50214, 'Thema kan niet verwijderd worden. Thema wordt nog gebruikt bij rondes.', 1
 
-		IF EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
-		BEGIN
-			DELETE FROM THEMA
-			WHERE Thema = @thema
-		END
-		ELSE
-			SET @error = 'Thema ' + @thema + ' kan niet verwijdered worden. Thema ' + @thema + ' bestaat niet.';
-			THROW 50213, @error, 1
+		IF NOT EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
+			THROW 50213, 'Thema kan niet verwijderd worden. Thema bestaat niet.', 1
+
+		DELETE FROM THEMA
+		WHERE Thema = @thema
 
 		COMMIT TRANSACTION 
 	END TRY	  
