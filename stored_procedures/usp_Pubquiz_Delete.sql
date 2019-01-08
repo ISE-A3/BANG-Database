@@ -1,9 +1,8 @@
 USE BANG;
 GO
 
-CREATE or ALTER PROCEDURE dbo.usp_Pubquiz_Update
-	@EVENEMENT_NAAM varchar(256),
-	@NIEUWE_PUBQUIZ_TITEL VARCHAR(256)
+CREATE or ALTER PROCEDURE dbo.usp_Pubquiz_Delete
+	@EVENEMENT_NAAM varchar(256)
 AS
 BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -23,9 +22,18 @@ BEGIN
 			THROW 50206, 'Er bestaat geen pubquiz voor dit evenement', 1
 		ELSE
 
-		--succes operatie hier
-		UPDATE PUBQUIZ
-		SET PUBQUIZ_TITEL = @NIEUWE_PUBQUIZ_TITEL
+		--succes operatie hier		
+		IF EXISTS (
+			SELECT ''
+			FROM PUBQUIZRONDE PR
+			INNER JOIN EVENEMENT E 
+			ON PR.EVENEMENT_ID = E.EVENEMENT_ID 
+			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
+			)
+			EXECUTE dbo.usp_Pubquizronde_Delete @EVENEMENT_NAAM, @RONDE_NUMMER = NULL
+
+
+		DELETE FROM PUBQUIZ
 		WHERE EVENEMENT_ID = (
 			SELECT EVENEMENT_ID
 			FROM EVENEMENT

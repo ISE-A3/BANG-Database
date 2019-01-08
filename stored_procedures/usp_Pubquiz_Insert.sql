@@ -1,9 +1,5 @@
-use BANG
+use BANG;
 go
-
-/*
-INSERT PUBQUIZ
-*/
 
 CREATE or ALTER PROCEDURE dbo.usp_Pubquiz_Insert
 	@EVENEMENT_NAAM varchar(256),
