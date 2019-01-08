@@ -24,13 +24,13 @@ BEGIN
 						WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 					)
 			THROW 50205, 'Er is al een pubquiz bij dit evenement', 1
-		ELSE
 
+		IF(SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM) IS NULL
+			THROW 50205, 'Dit evenement bestaat niet meer', 1
+		
 		--succes operatie hier
 		INSERT INTO PUBQUIZ (EVENEMENT_ID, PUBQUIZ_TITEL)
 		VALUES ((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM), @PUBQUIZ_TITEL)
-
-
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
