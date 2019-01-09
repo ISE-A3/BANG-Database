@@ -38,7 +38,7 @@ BEGIN
 				FROM VRAAGONDERDEEL
 				GROUP BY VRAAGONDERDEELNUMMER
 				HAVING VRAAGONDERDEELNUMMER = (MAX(VRAAGONDERDEELNUMMER)+1)
-				s)
+				)
 			)
             THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1
 		ELSE
