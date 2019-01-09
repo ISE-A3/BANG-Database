@@ -27,6 +27,11 @@ BEGIN
 			THROW 50001, 'Dit vraagonderdeel bestaat niet', 1
 		ELSE
 
+		IF @VRAAGSOORT IS NOT NULL BEGIN
+			IF (@VRAAGSOORT != 'O' AND @VRAAGSOORT != 'G')
+				THROW 50009, 'Het vraagsoort kan alleen O(open) of G(gesloten) zijn', 1
+		END
+
 		--succes operatie hier
 		UPDATE VRAAGONDERDEEL
 		SET	VRAAGONDERDEELNUMMER = ISNULL (@NIEUW_VRAAGONDERDEELNUMMER, VRAAGONDERDEELNUMMER),

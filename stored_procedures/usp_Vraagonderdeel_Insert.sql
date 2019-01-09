@@ -25,6 +25,9 @@ BEGIN
 			WHERE VRAAG_NAAM = @VRAAG_NAAM
 			)
 			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1
+
+		IF (@VRAAGSOORT != 'O' AND @VRAAGSOORT != 'G')
+			THROW 50009, 'Het vraagsoort kan alleen O(open) of G(gesloten) zijn', 1
 		
 		IF EXISTS (
             SELECT ''
