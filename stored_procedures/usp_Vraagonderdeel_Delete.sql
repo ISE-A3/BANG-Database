@@ -1,25 +1,9 @@
 use BANG;
 go
 
-CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
+CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Delete
 	@VRAAG_NAAM varchar(256),
-	@VRAAGONDERDEELNUMMER int,
-	@VRAAGONDERDEEL varchar(256),
-	@VRAAGSOORT char(1)
-
-use BANG
-GO
-
-/*
-INSERT VRAAGONDERDEEL
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
-@VRAAGONDERDEELNUMMER INT NOT NULL,
-@VRAAGONDERDEEL VARCHAR(256) NOT NULL,
-@VRAAGSOORT VARCHAR(256) NOT NULL,
-@ANTWOORD VARCHAR(256) NOT NULL,
-@PUNTEN INT NOT NULL
+	@VRAAGONDERDEELNUMMER int
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -27,37 +11,43 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-
+		
 		--checks hier
 		IF NOT EXISTS (
 			SELECT ''
+			FROM VRAAGONDERDEEL VO
+			INNER JOIN VRAAG V
+			ON VO.VRAAG_ID = V.VRAAG_ID
+			WHERE VRAAG_NAAM = @VRAAG_NAAM
+			AND VO.VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
+			)
+			THROW 50001, 'Dit vraagonderdeel bestaat niet', 1
+		ELSE
+
+		--succes operatie hier
+		IF EXISTS (
+			SELECT ''
+			FROM ANTWOORD
+			WHERE VRAAGONDERDEEL_ID = (
+				SELECT VRAAGONDERDEEL_ID
+				FROM VRAAGONDERDEEL
+				WHERE VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
+				AND VRAAG_ID = (
+					SELECT VRAAG_ID
+					FROM VRAAG
+					WHERE VRAAG_NAAM = @VRAAG_NAAM
+					)
+				)
+			)
+			EXECUTE dbo.usp_Antwoord_Delete
+
+		DELETE FROM VRAAGONDERDEEL
+		WHERE VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
+		AND VRAAG_ID = (
+			SELECT VRAAG_ID
 			FROM VRAAG
 			WHERE VRAAG_NAAM = @VRAAG_NAAM
 			)
-			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1
-		ELSE
-
-		--succes operatie hier
-		INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
-		VALUES ((
-			SELECT VRAAG_ID
-			FROM VRAAG
-			WHERE VRAAG_NAAM = @VRAAG_NAAM),
-			@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
-
-		--checks hier
-		IF
-		--succes operatie hier
-		ELSE
-			--Afvangen dat wanneer er niets is ingevuld in de front end, er wel iets wordt ingevuld in de database. (Eigenlijk moet dit de rondenaam zijn, maar dat is niet voor deze
-			--iteratie)
-			--IF @VRAAG_TITEL = 'NULL'	(	SELECT @VRAAG_TITEL = 
-			--Wanneer Thema NULL is, afvangen dat Ronde Thema wordt ingevuld
-			INSERT INTO VRAAGONDERDEEL
-			VALUES(@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
-
-			INSERT INTO ANTWOORD
-			VALUES(@ANTWOORD, @PUNTEN)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
