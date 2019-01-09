@@ -25,6 +25,19 @@ BEGIN
 			WHERE VRAAG_NAAM = @VRAAG_NAAM
 			)
 			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1
+		
+		IF EXISTS (
+            SELECT ''
+            FROM VRAAGONDERDEEL
+            WHERE VRAAG_ID = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+			AND @VRAAGONDERDEELNUMMER != (
+				SELECT VRAAGONDERDEELNUMMER
+				FROM VRAAGONDERDEEL
+				GROUP BY VRAAGONDERDEELNUMMER
+				HAVING VRAAGONDERDEELNUMMER = (MAX(VRAAGONDERDEELNUMMER)+1)
+				s)
+			)
+            THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1
 		ELSE
 
 		--succes operatie hier
