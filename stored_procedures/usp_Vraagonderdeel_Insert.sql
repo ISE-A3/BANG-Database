@@ -6,6 +6,20 @@ CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
 	@VRAAGONDERDEELNUMMER int,
 	@VRAAGONDERDEEL varchar(256),
 	@VRAAGSOORT char(1)
+
+use BANG
+GO
+
+/*
+INSERT VRAAGONDERDEEL
+*/
+
+CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
+@VRAAGONDERDEELNUMMER INT NOT NULL,
+@VRAAGONDERDEEL VARCHAR(256) NOT NULL,
+@VRAAGSOORT VARCHAR(256) NOT NULL,
+@ANTWOORD VARCHAR(256) NOT NULL,
+@PUNTEN INT NOT NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -13,7 +27,7 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-		
+
 		--checks hier
 		IF NOT EXISTS (
 			SELECT ''
@@ -30,6 +44,20 @@ BEGIN
 			FROM VRAAG
 			WHERE VRAAG_NAAM = @VRAAG_NAAM),
 			@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
+
+		--checks hier
+		IF
+		--succes operatie hier
+		ELSE
+			--Afvangen dat wanneer er niets is ingevuld in de front end, er wel iets wordt ingevuld in de database. (Eigenlijk moet dit de rondenaam zijn, maar dat is niet voor deze
+			--iteratie)
+			--IF @VRAAG_TITEL = 'NULL'	(	SELECT @VRAAG_TITEL = 
+			--Wanneer Thema NULL is, afvangen dat Ronde Thema wordt ingevuld
+			INSERT INTO VRAAGONDERDEEL
+			VALUES(@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
+
+			INSERT INTO ANTWOORD
+			VALUES(@ANTWOORD, @PUNTEN)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

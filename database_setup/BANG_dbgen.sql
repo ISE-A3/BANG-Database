@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     21-12-2018 13:15:33                          */
+/* Created on:     8-1-2019 14:07:15                            */
 /*==============================================================*/
 
 USE master
@@ -347,8 +347,8 @@ if exists(select 1 from systypes where name='ADRES')
    drop type ADRES
 go
 
-if exists(select 1 from systypes where name='ANTWOORD')
-   drop type ANTWOORD
+if exists(select 1 from systypes where name='ANTWOORD_OPTIE')
+   drop type ANTWOORD_OPTIE
 go
 
 if exists(select 1 from systypes where name='DATUM')
@@ -367,8 +367,8 @@ if exists(select 1 from systypes where name='HUISNUMMER_TOEVOEGING')
    drop type HUISNUMMER_TOEVOEGING
 go
 
-if exists(select 1 from systypes where name='LOCATIE')
-   drop type LOCATIE
+if exists(select 1 from systypes where name='LOCATIE_NAAM')
+   drop type LOCATIE_NAAM
 go
 
 if exists(select 1 from systypes where name='NAAM')
@@ -391,8 +391,8 @@ if exists(select 1 from systypes where name='SURROGATE_KEY')
    drop type SURROGATE_KEY
 go
 
-if exists(select 1 from systypes where name='THEMA')
-   drop type THEMA
+if exists(select 1 from systypes where name='THEMA_NAAM')
+   drop type THEMA_NAAM
 go
 
 if exists(select 1 from systypes where name='VOLGNUMMER')
@@ -453,9 +453,9 @@ create type ADRES
 go
 
 /*==============================================================*/
-/* Domain: ANTWOORD                                             */
+/* Domain: ANTWOORD_OPTIE                                       */
 /*==============================================================*/
-create type ANTWOORD
+create type ANTWOORD_OPTIE
    from varchar(256)
 go
 
@@ -491,9 +491,9 @@ execute sp_bindefault D_, 'HUISNUMMER_TOEVOEGING'
 go
 
 /*==============================================================*/
-/* Domain: LOCATIE                                              */
+/* Domain: LOCATIE_NAAM                                         */
 /*==============================================================*/
-create type LOCATIE
+create type LOCATIE_NAAM
    from varchar(256)
 go
 
@@ -533,9 +533,9 @@ create type SURROGATE_KEY
 go
 
 /*==============================================================*/
-/* Domain: THEMA                                                */
+/* Domain: THEMA_NAAM                                           */
 /*==============================================================*/
-create type THEMA
+create type THEMA_NAAM
    from varchar(256)
 go
 
@@ -572,7 +572,7 @@ go
 create table ANTWOORD (
    ANTWOORD_ID          SURROGATE_KEY        identity,
    VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
-   ANTWOORD             ANTWOORD             not null,
+   ANTWOORD             ANTWOORD_OPTIE       not null,
    PUNTEN               PUNTEN               not null,
    constraint PK_ANTWOORD primary key nonclustered (ANTWOORD_ID),
    constraint AK_NATURAL_ANTWOORD unique (ANTWOORD, VRAAGONDERDEEL_ID)
@@ -610,7 +610,7 @@ create table EVENEMENT (
    HUISNUMMER           HUISNUMMER           not null,
    HUISNUMMER_TOEVOEGING HUISNUMMER_TOEVOEGING not null,
    constraint PK_EVENEMENT primary key nonclustered (EVENEMENT_ID),
-   constraint AK_NATURAL_EVENEMENT unique (EVENEMENT_NAAM)
+   constraint AK_NATURAL_EVENEMEN unique (EVENEMENT_NAAM)
 )
 go
 
@@ -629,7 +629,7 @@ go
 /* Table: LOCATIE                                               */
 /*==============================================================*/
 create table LOCATIE (
-   LOCATIENAAM          LOCATIE              null,
+   LOCATIENAAM          LOCATIE_NAAM         null,
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
@@ -674,7 +674,7 @@ go
 create table PUBQUIZRONDE (
    EVENEMENT_ID         SURROGATE_KEY        not null,
    RONDENUMMER          VOLGNUMMER           not null,
-   THEMA                THEMA                not null,
+   THEMA                THEMA_NAAM           not null,
    RONDENAAM            NAAM                 null,
    constraint PK_PUBQUIZRONDE primary key nonclustered (EVENEMENT_ID, RONDENUMMER)
 )
@@ -775,7 +775,7 @@ go
 /* Table: THEMA                                                 */
 /*==============================================================*/
 create table THEMA (
-   THEMA                THEMA                not null,
+   THEMA                THEMA_NAAM           not null,
    constraint PK_THEMA primary key nonclustered (THEMA)
 )
 go
@@ -785,7 +785,7 @@ go
 /*==============================================================*/
 create table THEMA_BIJ_VRAAG (
    VRAAG_ID             SURROGATE_KEY        not null,
-   THEMA                THEMA                not null,
+   THEMA                THEMA_NAAM           not null,
    constraint PK_THEMA_BIJ_VRAAG primary key (VRAAG_ID, THEMA)
 )
 go
@@ -852,77 +852,77 @@ VRAAG_ID ASC
 go
 
 alter table ANTWOORD
-   add constraint FK_ANTWOORD_BIJ__VRAAGONDERDEEL foreign key (VRAAGONDERDEEL_ID)
+   add constraint FK_ANTWOORD_ANTWOORD__VRAAGOND foreign key (VRAAGONDERDEEL_ID)
       references VRAAGONDERDEEL (VRAAGONDERDEEL_ID)
 go
 
 alter table EVENEMENT
-   add constraint FK_EVENEMENT_OP_LOCATIE foreign key (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
+   add constraint FK_EVENEMEN_EVENEMENT_LOCATIE foreign key (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
       references LOCATIE (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
 go
 
 alter table NUMMER
-   add constraint FK_NUMMER_VAN_ARTIEST foreign key (ARTIEST_ID)
+   add constraint FK_NUMMER_NUMMER_VA_ARTIEST foreign key (ARTIEST_ID)
       references ARTIEST (ARTIEST_ID)
 go
 
 alter table PUBQUIZ
-   add constraint FK_PUBQUIZ_IS_EEN_EVENEMENT foreign key (EVENEMENT_ID)
+   add constraint FK_PUBQUIZ_IS_EEN_EV_EVENEMEN foreign key (EVENEMENT_ID)
       references EVENEMENT (EVENEMENT_ID)
 go
 
 alter table PUBQUIZRONDE
-   add constraint FK_PUBQUIZRONDE_VAN_PUBQUIZ foreign key (EVENEMENT_ID)
+   add constraint FK_PUBQUIZR_PUBQUIZRO_PUBQUIZ foreign key (EVENEMENT_ID)
       references PUBQUIZ (EVENEMENT_ID)
 go
 
 alter table PUBQUIZRONDE
-   add constraint FK_PUBQUIZRONDE_MET_THEMA foreign key (THEMA)
+   add constraint FK_PUBQUIZR_THEMA_VAN_THEMA foreign key (THEMA)
       references THEMA (THEMA)
 go
 
 alter table PUBQUIZRONDEVRAAG
-   add constraint FK_VRAAG_UIT_PUBQUIZROONDEVRAAG_IN_PUBQUIZ foreign key (EVENEMENT_ID, RONDENUMMER)
+   add constraint FK_PUBQUIZR_PUBQUIZRO_PUBQUIZR foreign key (EVENEMENT_ID, RONDENUMMER)
       references PUBQUIZRONDE (EVENEMENT_ID, RONDENUMMER)
 go
 
 alter table PUBQUIZRONDEVRAAG
-   add constraint FK_VRAAG_VOOR_PUBQUIZRONDEVRAAG_PUBQUIZRONDE foreign key (VRAAG_ID)
+   add constraint FK_PUBQUIZR_VRAAG_IN__VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 
 alter table STEM
-   add constraint FK_STEM_VOOR_NUMMER foreign key (NUMMER_ID)
+   add constraint FK_STEM_NUMMER_IN_NUMMER foreign key (NUMMER_ID)
       references NUMMER (NUMMER_ID)
 go
 
 alter table STEM
-   add constraint FK_STEM_VOOR_TOP100 foreign key (EVENEMENT_ID)
+   add constraint FK_STEM_STEM_IN_T_TOP100 foreign key (EVENEMENT_ID)
       references TOP100 (EVENEMENT_ID)
 go
 
 alter table STEM
-   add constraint FK_STEM_VAN_STEMMER foreign key (EMAILADRES)
+   add constraint FK_STEM_STEM_VAN__STEMMER foreign key (EMAILADRES)
       references STEMMER (EMAILADRES)
 go
 
 alter table THEMA_BIJ_VRAAG
-   add constraint FK_THEMA_UIT_THEMA_BIJ_VRAAG foreign key (VRAAG_ID)
+   add constraint FK_THEMA_BI_THEMA_BIJ_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 
 alter table THEMA_BIJ_VRAAG
-   add constraint FK_THEMA_VOOR_VRAAG_UIT_THEMA foreign key (THEMA)
+   add constraint FK_THEMA_BI_THEMA_BIJ_THEMA foreign key (THEMA)
       references THEMA (THEMA)
 go
 
 alter table TOP100
-   add constraint FK_TOP100_IS_EEN_EVENEMENT foreign key (EVENEMENT_ID)
+   add constraint FK_TOP100_IS_EEN_EV_EVENEMEN foreign key (EVENEMENT_ID)
       references EVENEMENT (EVENEMENT_ID)
 go
 
 alter table VRAAGONDERDEEL
-   add constraint FK_VRAAGONDERDEEL_VAN_VRAAG foreign key (VRAAG_ID)
+   add constraint FK_VRAAGOND_VRAAGONDE_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
 

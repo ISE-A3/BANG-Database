@@ -1,16 +1,8 @@
 use BANG
-go
+GO
 
-/*
-INSERT LOCATIE
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Locatie_Insert
-@LOCATIENAAM varchar(256),
-@PLAATSNAAM varchar(256),
-@ADRES varchar(256),
-@HUISNUMMER int,
-@HUISNUMMER_TOEVOEGING char(1)
+CREATE or ALTER PROCEDURE dbo.usp_Thema_Insert
+@thema varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -18,13 +10,18 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
+
+		DECLARE @error varchar(1024)
+				
+		IF EXISTS (SELECT '' FROM THEMA WHERE THEMA = @thema)
+			BEGIN
+				SET @error = 'Thema ' + @thema + ' kan niet aangepast worden. Thema ' + @thema + ' bestaat al.';
+				THROW 50211, @error, 1
+			END
 		
-		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER AND HUISNUMMER_TOEVOEGING = @HUISNUMMER_TOEVOEGING)
-			INSERT INTO LOCATIE
-			VALUES (@LOCATIENAAM, @PLAATSNAAM, @ADRES, @HUISNUMMER, @HUISNUMMER_TOEVOEGING)
 
-
-		--als flow tot dit punt komt transactie counter met 1 verlagen
+		INSERT INTO THEMA(THEMA)
+		VALUES(@thema)
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
