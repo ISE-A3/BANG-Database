@@ -1,8 +1,8 @@
 USE BANG
-EXEC tSQLt.NewTestClass 'PubquizrondevraagInsert';
+EXEC tSQLt.NewTestClass 'PubquizrondeDelete';
 GO
 
-CREATE PROCEDURE [PubquizrondevraagInsert].[test voor insert van een pubquizrondevraag]
+CREATE PROCEDURE [PubquizrondeDelete].[test voor delete van een pubquizronde]
 AS
 BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZ';
@@ -26,13 +26,16 @@ BEGIN
 	VALUES(1, 'Olympische Spelen', 'vraagtitel1')
 	
 	EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test';
-	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 1;
-	
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'Voetbal';
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 2, 'Geschiedenis', 'Oudheid';
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1	--test voor multiple rows & dubbele waarde
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 2, 'Olympische Spelen', 1	--test voor fout rondenummer
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spele', 1		--test voor foute vraagnaam
+	
+	EXECUTE dbo.usp_Pubquizronde_Delete 'Pubquiz1', 1;
+	--EXECUTE dbo.usp_Pubquizronde_Delete 'Pubquiz1';		--test voor NULL waarde, verwijdert alle rondes
+	--EXECUTE dbo.usp_Pubquizronde_Delete 'Pubquiz1', 2;	--test voor multiple rows
+	--EXECUTE dbo.usp_Pubquizronde_Delete 'Pubquiz1', 3;	--test voor foutieve invoer
+
 END
 GO
 
-EXEC tSQLt.Run '[PubquizrondevraagInsert].[test voor insert van een pubquizrondevraag]';
+EXEC tSQLt.Run '[PubquizrondeDelete].[test voor delete van een pubquizronde]';

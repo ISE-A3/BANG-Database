@@ -1,8 +1,8 @@
 USE BANG
-EXEC tSQLt.NewTestClass 'PubquizrondevraagInsert';
+EXEC tSQLt.NewTestClass 'PubquizrondeUpdate';
 GO
 
-CREATE PROCEDURE [PubquizrondevraagInsert].[test voor insert van een pubquizrondevraag]
+CREATE PROCEDURE [PubquizrondeUpdate].[test voor update van een pubquizronde]
 AS
 BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZ';
@@ -26,13 +26,15 @@ BEGIN
 	VALUES(1, 'Olympische Spelen', 'vraagtitel1')
 	
 	EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test';
-	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 1;
-	
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'Voetbal';
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 2, 'Geschiedenis', 'Oudheid';
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1	--test voor multiple rows & dubbele waarde
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 2, 'Olympische Spelen', 1	--test voor fout rondenummer
-	--EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spele', 1		--test voor foute vraagnaam
+
+	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 3, 'Wiskunde', 'Pythagoras';		--test voor ronde nummer & thema update
+	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Wiskunde', 'Pythagoras';		--test voor thema update
+	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Algemeen';						--test voor NULL waarde
+
 END
 GO
 
-EXEC tSQLt.Run '[PubquizrondevraagInsert].[test voor insert van een pubquizrondevraag]';
+EXEC tSQLt.Run '[PubquizrondeUpdate].[test voor update van een pubquizronde]';
