@@ -1,4 +1,4 @@
-use BANG
+USE BANG;
 GO
 
 /*
@@ -16,7 +16,6 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		--checks hier
-		--succes operatie hier
 		IF NOT EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 			THROW 50221, 'Deze vraag bestaat niet.', 1
 
@@ -25,7 +24,8 @@ BEGIN
 
 		IF EXISTS (SELECT '' FROM VRAAGONDERDEEL WHERE VRAAG_ID IN (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM))
 			EXECUTE dbo.usp_Vraagonderdeel_Delete --@VRAAG_NAAM
-			
+		
+		--succes operatie hier
 		DELETE FROM VRAAG
 		WHERE VRAAG_NAAM = @VRAAG_NAAM
 

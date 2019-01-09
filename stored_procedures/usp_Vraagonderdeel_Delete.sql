@@ -1,5 +1,9 @@
-use BANG;
-go
+USE BANG;
+GO
+
+/*
+DELETE VRAAGONDERDEEL
+*/
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Delete
 	@VRAAG_NAAM varchar(256),
@@ -22,7 +26,6 @@ BEGIN
 			AND VO.VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
 			)
 			THROW 50001, 'Dit vraagonderdeel bestaat niet', 1
-		ELSE
 
 		--succes operatie hier
 		IF EXISTS (
