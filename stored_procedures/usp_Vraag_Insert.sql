@@ -6,8 +6,8 @@ INSERT VRAAG
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert
-@VRAAG_NAAM varchar(256) NOT NULL,
-@VRAAG_TITEL varchar(256) NULL
+@VRAAG_NAAM varchar(256),
+@VRAAG_TITEL varchar(256) = NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -18,7 +18,7 @@ BEGIN
 
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
-		ELSE
+
 			INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
 			VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
 
@@ -26,7 +26,7 @@ BEGIN
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
-		IF XACT_STATE() = -1 and @startTrancount = 0  -- "doomed" transaction, eigen context only
+		IF XACT_STATE() = -1 and @startTrancsount = 0  -- "doomed" transaction, eigen context only
 			BEGIN
 				ROLLBACK TRANSACTION
 				PRINT 'Buitentran state -1 eigen context'
