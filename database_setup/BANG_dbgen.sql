@@ -591,7 +591,7 @@ go
 /* Table: ARTIEST                                               */
 /*==============================================================*/
 create table ARTIEST (
-   ARTIEST_ID           SURROGATE_KEY        not null,
+   ARTIEST_ID           SURROGATE_KEY        identity,
    ARTIEST_NAAM         NAAM                 not null,
    constraint PK_ARTIEST primary key nonclustered (ARTIEST_ID),
    constraint AK_NATURAL_ARTIEST unique (ARTIEST_NAAM)
@@ -604,7 +604,7 @@ go
 create table EVENEMENT (
    EVENEMENT_NAAM       NAAM                 not null,
    EVENEMENT_DATUM      DATUM                not null,
-   EVENEMENT_ID         SURROGATE_KEY        not null,
+   EVENEMENT_ID         SURROGATE_KEY        identity,
    PLAATSNAAM           PLAATSNAAM           not null,
    ADRES                ADRES                not null,
    HUISNUMMER           HUISNUMMER           not null,
@@ -642,7 +642,7 @@ go
 /* Table: NUMMER                                                */
 /*==============================================================*/
 create table NUMMER (
-   NUMMER_ID            SURROGATE_KEY        not null,
+   NUMMER_ID            SURROGATE_KEY        identity,
    ARTIEST_ID           SURROGATE_KEY        not null,
    NUMMER_TITEL         NAAM                 not null,
    constraint PK_NUMMER primary key nonclustered (NUMMER_ID),

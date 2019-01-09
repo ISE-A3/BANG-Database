@@ -24,8 +24,14 @@ BEGIN
 							ON T.EVENEMENT_ID = E.EVENEMENT_ID 
 						WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 					)
-			THROW 50201, 'Er is al een top 100 bij dit evenement', 1;
-		ELSE
+			THROW 50201, 'Er is al een top 100 bij dit evenement.', 1;
+			
+		IF datediff(DAY, @STARTDATUM, @EINDDATUM) < 0
+			THROW 50113, 'De startdatum moet voor de einddatum liggen of er aan gelijk zijn.', 1;
+
+		IF datediff(DAY, @EINDDATUM, (SELECT EVENEMENT_DATUM FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)) < 0
+			THROW 50113, 'De startdatum moet voor de einddatum liggen of er aan gelijk zijn.', 1;
+		
 			--succes operatie hier
 			INSERT INTO TOP100 (EVENEMENT_ID, STARTDATUM, EINDDATUM)
 			VALUES ((SELECT EVENEMENT_ID FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM), @STARTDATUM, @EINDDATUM);
