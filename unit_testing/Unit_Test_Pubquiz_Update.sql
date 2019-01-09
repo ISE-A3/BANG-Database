@@ -1,8 +1,8 @@
 USE BANG
-EXEC tSQLt.NewTestClass 'PubquizInsert';
+EXEC tSQLt.NewTestClass 'PubquizUpdate';
 GO
 
-CREATE PROCEDURE [PubquizInsert].[test voor insert van een pubquiz]
+CREATE PROCEDURE [PubquizUpdate].[test voor update van een pubquiz]
 AS
 BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZ';
@@ -17,10 +17,11 @@ BEGIN
 	VALUES('Pubquiz1', '1999-02-02', 1, 'Cuijk', 'Beerseweg', 15, 'B')
 	
 	EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test';
-	--EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test2';	test voor multiple executes en check op dubbele waardes 
-	--EXECUTE usp_Pubquiz_Insert 'Pubquiz2', 'Pubquiz_Insert_test2';	test om te controleren op evenementnamen die niet bestaan
 
+	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', 'Pubquiz_titel_test';	--test voor update pubquiz titel
+	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz2', 'Pubquiz_titel_test';	--test voor foutieve invoer evenement
+	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', NULL;	--test voor NULL waarde
 END
 GO
 
-EXEC tSQLt.Run '[PubquizInsert].[test voor insert van een pubquiz]';
+EXEC tSQLt.Run '[PubquizUpdate].[test voor update van een pubquiz]';

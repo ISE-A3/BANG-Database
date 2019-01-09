@@ -12,7 +12,9 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		--checks hier
+		IF(@NIEUWE_PUBQUIZ_TITEL IS NULL)
+			THROW 50200, 'Vul een pubquiz titel in voor dit evenement', 1
+
 		IF NOT EXISTS (
 			SELECT '' 
 			FROM PUBQUIZ P 
@@ -23,7 +25,6 @@ BEGIN
 			THROW 50206, 'Er bestaat geen pubquiz voor dit evenement', 1
 		ELSE
 
-		--succes operatie hier
 		UPDATE PUBQUIZ
 		SET PUBQUIZ_TITEL = @NIEUWE_PUBQUIZ_TITEL
 		WHERE EVENEMENT_ID = (

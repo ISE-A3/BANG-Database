@@ -11,7 +11,6 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		--checks hier
 		IF NOT EXISTS (
 			SELECT '' 
 			FROM PUBQUIZ P 
@@ -20,9 +19,7 @@ BEGIN
 			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 			)
 			THROW 50206, 'Er bestaat geen pubquiz voor dit evenement', 1
-		ELSE
-
-		--succes operatie hier		
+			
 		IF EXISTS (
 			SELECT ''
 			FROM PUBQUIZRONDE PR
@@ -30,7 +27,7 @@ BEGIN
 			ON PR.EVENEMENT_ID = E.EVENEMENT_ID 
 			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 			)
-			EXECUTE dbo.usp_Pubquizronde_Delete @EVENEMENT_NAAM, @RONDE_NUMMER = NULL
+			EXECUTE dbo.usp_Pubquizronde_Delete @EVENEMENT_NAAM, @RONDE_NUMMER = NULL;
 
 
 		DELETE FROM PUBQUIZ
