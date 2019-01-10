@@ -1,16 +1,13 @@
-use BANG
-go
+USE BANG
+GO
 
 /*
-INSERT LOCATIE
+INSERT VRAAG
 */
 
-CREATE or ALTER PROCEDURE dbo.usp_Locatie_Insert
-@LOCATIENAAM varchar(256),
-@PLAATSNAAM varchar(256),
-@ADRES varchar(256),
-@HUISNUMMER int,
-@HUISNUMMER_TOEVOEGING char(1)
+CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert
+@VRAAG_NAAM varchar(256),
+@VRAAG_TITEL varchar(256) = NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -18,17 +15,18 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-		
-		IF NOT EXISTS (SELECT '' FROM LOCATIE WHERE PLAATSNAAM = @PLAATSNAAM AND ADRES = @ADRES AND HUISNUMMER = @HUISNUMMER AND HUISNUMMER_TOEVOEGING = @HUISNUMMER_TOEVOEGING)
-			INSERT INTO LOCATIE
-			VALUES (@LOCATIENAAM, @PLAATSNAAM, @ADRES, @HUISNUMMER, @HUISNUMMER_TOEVOEGING)
 
+		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
+
+			INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
+			VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
-		IF XACT_STATE() = -1 and @startTrancount = 0  -- "doomed" transaction, eigen context only
+		IF XACT_STATE() = -1 and @startTrancsount = 0  -- "doomed" transaction, eigen context only
 			BEGIN
 				ROLLBACK TRANSACTION
 				PRINT 'Buitentran state -1 eigen context'
