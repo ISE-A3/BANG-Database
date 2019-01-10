@@ -40,7 +40,7 @@ GO
 CREATE OR ALTER PROC [UnitTestVraagonderdeel].[Test die controleert of hij niet meer verwijderd dan dat hij moet verwijderen]
 AS
 BEGIN
-	IF OBJECT_ID('EXPECTED') IS NOT NULL DROP TABLE EXPECTED;
+	IF OBJECT_ID('verwacht') IS NOT NULL DROP TABLE EXPECTED;
 
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAG', @IDENTITY = 1
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAGONDERDEEL', @IDENTITY = 1
@@ -51,17 +51,17 @@ BEGIN
 			(1, 4, NULL, 'O')
 
 	EXEC usp_Vraagonderdeel_Delete @VRAAG_NAAM = 'Vraag_Test', @VRAAGONDERDEELNUMMER = 4
-	CREATE TABLE EXPECTED (
+	CREATE TABLE verwacht (
 		[VRAAGONDERDEEL_ID] INT, 
 		[VRAAG_ID] INT, 
 		[VRAAGONDERDEELNUMMER] INT, 
 		[VRAAGONDERDEEL] VARCHAR(256), 
 		[VRAAGSOORT] CHAR(1)
 		)
-	INSERT INTO EXPECTED
+	INSERT INTO verwacht
 	VALUES	(1, 1, 1, NULL, 'G')
 
-	EXEC tSQLt.AssertEqualsTable 'expected', 'VRAAGONDERDEEL';
+	EXEC tSQLt.AssertEqualsTable 'verwacht', 'VRAAGONDERDEEL';
 END
 GO
 
