@@ -925,4 +925,3 @@ alter table VRAAGONDERDEEL
    add constraint FK_VRAAGOND_VRAAGONDE_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
-
