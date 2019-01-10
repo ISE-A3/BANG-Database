@@ -1,13 +1,4 @@
-use BANG;
-go
-
-CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
-	@VRAAG_NAAM varchar(256),
-	@VRAAGONDERDEELNUMMER int,
-	@VRAAGONDERDEEL varchar(256),
-	@VRAAGSOORT char(1)
-
-use BANG
+USE BANG;
 GO
 
 /*
@@ -15,11 +6,10 @@ INSERT VRAAGONDERDEEL
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraagonderdeel_Insert
-@VRAAGONDERDEELNUMMER INT NOT NULL,
-@VRAAGONDERDEEL VARCHAR(256) NOT NULL,
-@VRAAGSOORT VARCHAR(256) NOT NULL,
-@ANTWOORD VARCHAR(256) NOT NULL,
-@PUNTEN INT NOT NULL
+	@VRAAG_NAAM varchar(256),
+	@VRAAGONDERDEELNUMMER int,
+	@VRAAGONDERDEEL varchar(256),
+	@VRAAGSOORT char(1)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -27,6 +17,10 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
+		DECLARE @VRAAG_ID INT
+		SET @VRAAG_ID = (SELECT VRAAG_ID
+						FROM VRAAG
+						WHERE VRAAG_NAAM = @VRAAG_NAAM)
 
 		--checks hier
 		IF NOT EXISTS (
@@ -34,30 +28,35 @@ BEGIN
 			FROM VRAAG
 			WHERE VRAAG_NAAM = @VRAAG_NAAM
 			)
-			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1
+			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1;
+
+		IF EXISTS (
+			SELECT ''
+			FROM VRAAGONDERDEEL
+			WHERE VRAAG_ID = @VRAAG_ID AND
+			VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
+			)
+			THROW 50402, 'Dit vraagonderdeelnummer bestaat al', 1; 
+		--Als Vraagonderdeelnummer NIET 1 is én er geen vraagnummer bestaat dat gelijk is aan het ingevoerde vraagnummer - 1 dan...
+		IF @VRAAGONDERDEELNUMMER > 1
+		BEGIN
+			IF NOT EXISTS (
+				SELECT '' 
+				FROM VRAAGONDERDEEL
+				WHERE (@VRAAGONDERDEELNUMMER - 1) IN (
+					SELECT VRAAGONDERDEELNUMMER
+					FROM VRAAGONDERDEEL
+					WHERE VRAAG_ID = @VRAAG_ID
+					)
+				)
+				THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1;
+		END
+		IF @VRAAGSOORT != 'G' AND @VRAAGSOORT != 'O'
+			THROW 50403, 'Vraagsoort kan alleen open of gesloten zijn', 1;
 		ELSE
-
 		--succes operatie hier
-		INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
-		VALUES ((
-			SELECT VRAAG_ID
-			FROM VRAAG
-			WHERE VRAAG_NAAM = @VRAAG_NAAM),
-			@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
-
-		--checks hier
-		IF
-		--succes operatie hier
-		ELSE
-			--Afvangen dat wanneer er niets is ingevuld in de front end, er wel iets wordt ingevuld in de database. (Eigenlijk moet dit de rondenaam zijn, maar dat is niet voor deze
-			--iteratie)
-			--IF @VRAAG_TITEL = 'NULL'	(	SELECT @VRAAG_TITEL = 
-			--Wanneer Thema NULL is, afvangen dat Ronde Thema wordt ingevuld
-			INSERT INTO VRAAGONDERDEEL
-			VALUES(@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
-
-			INSERT INTO ANTWOORD
-			VALUES(@ANTWOORD, @PUNTEN)
+			INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
+			VALUES (@VRAAG_ID, @VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
