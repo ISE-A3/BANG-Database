@@ -42,12 +42,14 @@ BEGIN
 			BEGIN
 				ROLLBACK TRANSACTION @savepoint --werk van deze sproc ongedaan gemaakt
 				COMMIT TRANSACTION --trancount 1 omlaag
-				PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
+				--PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
 			END
+			DECLARE @errornumber int = ERROR_NUMBER();
 			DECLARE @errormessage varchar(2000) 
-			SET @errormessage ='Een fout is opgetreden in procedure ''' + object_name(@@procid) + '''.
-			Originele boodschap: ''' + ERROR_MESSAGE() + ''''
-			RAISERROR(@errormessage, 16, 1) --of throw gebruiken, dat kan ook 
+			SET @errormessage = CAST(ERROR_NUMBER() as varchar) +'Een fout is opgetreden in procedure ''' + object_name(@@procid) + '''.
+			Originele boodschap: ''' + ERROR_MESSAGE() + '''';
+			
+			THROW @errornumber, @errormessage, 1; --of throw gebruiken, dat kan ook 
 	END CATCH
 END;	
 GO
