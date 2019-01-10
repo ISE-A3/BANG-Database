@@ -35,34 +35,6 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE [UnitTestAntwoord].[Test die controleerd of vraag bestaat, waarvan vraagonderdeel voor antwoord onderdeel van is]
-AS
-BEGIN
-	--Assemble 	
-	IF OBJECT_ID('[UnitTestAntwoord].[verwacht]','Table') IS NOT NULL
-	DROP TABLE [UnitTestAntwoord].[verwacht]
-
-	SELECT *
-	INTO [UnitTestAntwoord].[verwacht]
-	FROM dbo.ANTWOORD;
-
-	EXEC tSQLt.FakeTable 'dbo.VRAAG', @Identity = 1
-	EXEC tSQLt.FakeTable 'dbo.VRAAGONDERDEEL', @Identity = 1
-	EXEC tSQLt.FakeTable 'dbo.ANTWOORD', @Identity = 1
-
-	INSERT INTO dbo.VRAAG (VRAAG_NAAM, VRAAG_TITEL)
-	VALUES ('Test', NULL)
-
-	INSERT INTO dbo.VRAAGONDERDEEL (VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
-	VALUES (1, 1, 'Test', 'G')
-
-	EXEC tSQLt.ExpectException
-	EXEC usp_Antwoord_Insert @VRAAG_NAAM = 'Testfout', @VRAAGONDERDEELNUMMER = 1, @ANTWOORD = 'Testantwoord', @PUNTEN = 1
-
-	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
-END
-GO
-
 CREATE PROCEDURE [UnitTestAntwoord].[Test die controleerd of volgnummer voor antwoord bestaat]
 AS
 BEGIN
@@ -84,7 +56,8 @@ BEGIN
 	INSERT INTO dbo.VRAAGONDERDEEL (VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
 	VALUES (1, 1, 'Test', 'G')
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Antwoord_Insert''.
+			Originele boodschap: ''Dit vraagonderdeel bestaat niet'''
 	EXEC usp_Antwoord_Insert @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 2, @ANTWOORD = 'Testantwoord', @PUNTEN = 1
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
@@ -143,7 +116,8 @@ BEGIN
 	INSERT INTO dbo.VRAAGONDERDEEL (VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
 	VALUES (1, 1, 'Test', 'G')
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Antwoord_Insert''.
+			Originele boodschap: ''Punten kunnen niet lager zijn dan nul(0)'''
 	EXEC usp_Antwoord_Insert @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 1, @ANTWOORD = 'Testantwoord', @PUNTEN = -10
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 

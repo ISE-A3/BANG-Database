@@ -30,7 +30,8 @@ BEGIN
 	INSERT INTO dbo.ANTWOORD (VRAAGONDERDEEL_ID, ANTWOORD, PUNTEN)
 	VALUES (1, 'Test_Antwoord', 1)
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Antwoord_Update''.
+			Originele boodschap: ''Dit antwoord bestaat niet'''
 	EXEC dbo.usp_Antwoord_Update @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 1, @OUD_ANTWOORD = 'Testantwoord_Test', @NIEUW_ANTWOORD = 'Testantwoord', @PUNTEN = 1
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
@@ -61,10 +62,11 @@ BEGIN
 	VALUES (1, 1, 'Test', 'G')
 
 	INSERT INTO dbo.ANTWOORD (VRAAGONDERDEEL_ID, ANTWOORD, PUNTEN)
-	VALUES (1, 'Test_Antwoord', 1)
+	VALUES (1, 'Test_Antwoord_Test', 1)
 
-	EXEC tSQLt.ExpectException
-	EXEC dbo.usp_Antwoord_Update @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 1, @OUD_ANTWOORD = 'Testantwoord_Test', @NIEUW_ANTWOORD = 'Test_Antwoord', @PUNTEN = -1
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Antwoord_Update''.
+			Originele boodschap: ''Punten kunnen niet lager zijn dan nul(0)'''
+	EXEC dbo.usp_Antwoord_Update @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 1, @OUD_ANTWOORD = 'Test_Antwoord_Test', @NIEUW_ANTWOORD = 'Test_Antwoord', @PUNTEN = -1
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
 END

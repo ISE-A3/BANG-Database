@@ -31,13 +31,13 @@ BEGIN
 	INSERT INTO dbo.ANTWOORD (VRAAGONDERDEEL_ID, ANTWOORD, PUNTEN)
 	VALUES (1, 'Test_Antwoord', 1)
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_EenOfAlleAntwoordenVanVraagonderdeel_Delete''.
+			Originele boodschap: ''Dit antwoord bestaat niet'''
 	EXEC usp_EenOfAlleAntwoordenVanVraagonderdeel_Delete @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 1, @ANTWOORD = 'Testantwoord'
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
 END
 GO
-
 
 CREATE PROCEDURE [UnitTestAntwoord].[Test die controleert of vraagonderdeel bestaat bij het verwijderen]
 AS
@@ -66,8 +66,9 @@ BEGIN
 	INSERT INTO dbo.ANTWOORD(VRAAGONDERDEEL_ID, ANTWOORD, PUNTEN)
 	VALUES (1, 'Testantwoord', 1)
 
-	EXEC tSQLt.ExpectException
-	EXEC usp_EenOfAlleAntwoordenVanVraagonderdeel_Delete @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 2, @ANTWOORD = 'Testantwoord'
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_EenOfAlleAntwoordenVanVraagonderdeel_Delete''.
+			Originele boodschap: ''Dit vraagonderdeel bestaat niet'''
+	EXEC usp_EenOfAlleAntwoordenVanVraagonderdeel_Delete @VRAAG_NAAM = 'Test', @VRAAGONDERDEELNUMMER = 2
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
 END
@@ -148,7 +149,8 @@ BEGIN
 	INSERT INTO dbo.VRAAG (VRAAG_NAAM, VRAAG_TITEL)
 	VALUES ('Test', NULL)
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete''.
+			Originele boodschap: ''Deze vraag bestaat niet'''
 	EXEC dbo.usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete @VRAAG_NAAM = 'Test_Vraag'
 END
 GO
@@ -169,14 +171,15 @@ BEGIN
 	INSERT INTO dbo.VRAAG (VRAAG_NAAM, VRAAG_TITEL)
 	VALUES ('Test', NULL)
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete''.
+			Originele boodschap: ''Er bestaan geen vraagonderdelen bij deze vraag'''
 	EXEC dbo.usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete @VRAAG_NAAM = 'Test'
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.VRAAGONDERDEEL', 'Tables do not match' 
 END
 GO
 
-CREATE PROCEDURE [UnitTestAntwoord].[Test die controleert of antwoorden bestaan voor het verwijderen ervan bij het verwijderen vraag]
+CREATE PROCEDURE [UnitTestAntwoord].[Test die controleert of antwoorden bestaan bij het verwijderen van vraag]
 AS
 BEGIN
 	IF OBJECT_ID('[UnitTestAntwoord].[verwacht]','Table') IS NOT NULL
@@ -205,13 +208,13 @@ BEGIN
 	INSERT INTO dbo.ANTWOORD (VRAAGONDERDEEL_ID, ANTWOORD, PUNTEN)
 	VALUES (3, 'Testantwoord', 1)
 
-	EXEC tSQLt.ExpectException
+	EXEC tSQLt.ExpectException @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete''.
+			Originele boodschap: ''Er bestaan geen antwoorden voor de vraagonderdelen van deze vraag'''
 	EXEC dbo.usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete @VRAAG_NAAM = 'Test' 
 
 	EXEC tSQLt.AssertEqualsTable '[UnitTestAntwoord].[verwacht]', 'dbo.ANTWOORD', 'Tables do not match' 
 END
 GO
-
 
 EXEC tSQLt.RunAll
 GO
