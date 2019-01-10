@@ -2,9 +2,9 @@ USE BANG
 GO
 
 CREATE OR ALTER PROCEDURE dbo.usp_Thema_Bij_Vraag_Update
-@VRAAG_NAAM varchar(256) NOT NULL,
-@THEMA_HUIDIG varchar(256) NOT NULL,
-@THEMA_NIEUW varchar(256) NOT NULL
+@VRAAG_NAAM varchar(256),
+@THEMA_HUIDIG varchar(256),
+@THEMA_NIEUW varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
