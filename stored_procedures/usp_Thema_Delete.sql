@@ -1,38 +1,28 @@
 use BANG
-go
+GO
 
-/*
-SELECT EVENT
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Evenement_Select
-@EVENEMENT_NAAM varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Thema_Delete
+@thema varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
 	DECLARE @startTrancount int = @@TRANCOUNT;
 	BEGIN TRY
-	IF(@@Rowcount = 0) RETURN
-	SET NOCOUNT ON
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
-    
-		IF EXISTS (SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
-			SELECT	E.EVENEMENT_NAAM, E.EVENEMENT_DATUM, E.PLAATSNAAM, E.ADRES, E.HUISNUMMER, E.HUISNUMMER_TOEVOEGING,
-					L.LOCATIENAAM, 
-					T.STARTDATUM, T.EINDDATUM,
-					P.PUBQUIZ_TITEL
-			FROM EVENEMENT E INNER JOIN LOCATIE L
-				ON E.PLAATSNAAM = L.PLAATSNAAM AND E.ADRES = L.ADRES AND E.HUISNUMMER = L.HUISNUMMER AND E.HUISNUMMER_TOEVOEGING = L.HUISNUMMER_TOEVOEGING
-			LEFT JOIN PUBQUIZ P
-			 ON E.EVENEMENT_ID = P.EVENEMENT_ID
-			LEFT JOIN TOP100 T
-				ON E.EVENEMENT_ID = T.EVENEMENT_ID
-			WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM;
-		ELSE
-			THROW 50200, 'Het evenement bestaat niet', 1;
-    
-		--als flow tot dit punt komt transactie counter met 1 verlagen
+
+		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @thema)
+			THROW 50215, 'Thema kan niet verwijderd worden. Thema wordt gebruikt bij vragen', 1
+
+		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE THEMA = @thema)
+			THROW 50214, 'Thema kan niet verwijderd worden. Thema wordt nog gebruikt bij rondes.', 1
+
+		IF NOT EXISTS (SELECT '' FROM THEMA WHERE Thema = @thema)
+			THROW 50213, 'Thema kan niet verwijderd worden. Thema bestaat niet.', 1
+
+		DELETE FROM THEMA
+		WHERE Thema = @thema
+
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
