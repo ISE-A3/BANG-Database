@@ -36,8 +36,8 @@ BEGIN
 			WHERE VRAAG_ID = @VRAAG_ID AND
 			VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
 			)
-			THROW 50402, 'Dit vraagonderdeelnummer bestaat al', 1; 
-		--Als Vraagonderdeelnummer NIET 1 is én er geen vraagnummer bestaat dat gelijk is aan het ingevoerde vraagnummer - 1 dan...
+			THROW 50402, 'Dit vraagonderdeelnummer bestaat al', 1;
+    
 		IF @VRAAGONDERDEELNUMMER > 1
 		BEGIN
 			IF NOT EXISTS (
@@ -51,12 +51,17 @@ BEGIN
 				)
 				THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1;
 		END
-		IF @VRAAGSOORT != 'G' AND @VRAAGSOORT != 'O'
-			THROW 50403, 'Vraagsoort kan alleen open of gesloten zijn', 1;
-		ELSE
+    
+		IF (@VRAAGSOORT != 'O' AND @VRAAGSOORT != 'G')
+			THROW 50009, 'Het vraagsoort kan alleen O(open) of G(gesloten) zijn', 1
+
 		--succes operatie hier
-			INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
-			VALUES (@VRAAG_ID, @VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
+		INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
+		VALUES ((
+			SELECT VRAAG_ID
+			FROM VRAAG
+			WHERE VRAAG_NAAM = @VRAAG_NAAM),
+			@VRAAGONDERDEELNUMMER, @VRAAGONDERDEEL, @VRAAGSOORT)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

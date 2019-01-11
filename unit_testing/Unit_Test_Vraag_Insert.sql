@@ -9,7 +9,7 @@ GO
 EXEC tSQLt.NewTestClass 'UnitTestVraag'
 GO
 
-CREATE PROC [UnitTestVraag].[Test die controleert of vraag al bestaat bij het invoeren]
+CREATE PROC [UnitTestVraag].[Test die controleert of een al bestaande vraag niet dubbel geïnsert kan worden]
 AS
 BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAG'
@@ -22,7 +22,7 @@ BEGIN
 END
 GO
 
-CREATE PROC [UnitTestVraag].[Test die controleert of vraag is ingevoerd]
+CREATE PROC [UnitTestVraag].[Test die controleert of een vraag correct ingevoerd kan worden]
 AS
 BEGIN
 	IF OBJECT_ID('[UnitTestVraag].[verwacht]','Table') IS NOT NULL

@@ -1,4 +1,4 @@
-use BANG
+USE BANG;
 GO
 
 /*
@@ -6,7 +6,7 @@ DELETE VRAAG
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Delete
-@VRAAG_NAAM varchar(256) NOT NULL
+	@VRAAG_NAAM VARCHAR(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -16,16 +16,47 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		--checks hier
-		--succes operatie hier
-		IF NOT EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+		IF NOT EXISTS (
+			SELECT ''
+			FROM VRAAG
+			WHERE VRAAG_NAAM = @VRAAG_NAAM
+			)
 			THROW 50221, 'Deze vraag bestaat niet.', 1
 
-		IF EXISTS (SELECT '' FROM PUBQUIZRONDEVRAAG WHERE VRAAG_ID IN (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM))
+		IF EXISTS (
+			SELECT ''
+			FROM PUBQUIZRONDEVRAAG
+			WHERE VRAAG_ID IN (
+				SELECT VRAAG_ID
+				FROM VRAAG
+				WHERE VRAAG_NAAM = @VRAAG_NAAM
+				)
+			)
 			THROW 50228, 'De vraag wordt nog gebruikt bij een pubquiz.', 1
+		
+		--succes operatie hier
+		IF EXISTS (
+			SELECT ''
+			FROM VRAAGONDERDEEL
+			WHERE VRAAG_ID = (
+				SELECT VRAAG_ID
+				FROM VRAAG
+				WHERE VRAAG_NAAM = @VRAAG_NAAM
+				)
+			)
+			EXECUTE dbo.usp_Vraagonderdeel_Delete @VRAAG_NAAM = @VRAAG_NAAM
 
-		IF EXISTS (SELECT '' FROM VRAAGONDERDEEL WHERE VRAAG_ID IN (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM))
-			EXECUTE dbo.usp_Vraagonderdeel_Delete --@VRAAG_NAAM
-			
+			IF EXISTS (
+				SELECT ''
+				FROM THEMA_BIJ_VRAAG
+				WHERE VRAAG_ID = (
+					SELECT VRAAG_ID
+					FROM VRAAG
+					WHERE VRAAG_NAAM = @VRAAG_NAAM
+					) 
+				)
+				EXECUTE dbo.usp_Thema_Bij_Vraag_Delete @VRAAG_NAAM = @VRAAG_NAAM
+
 		DELETE FROM VRAAG
 		WHERE VRAAG_NAAM = @VRAAG_NAAM
 
