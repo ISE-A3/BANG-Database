@@ -42,7 +42,7 @@ BEGIN
 			BEGIN
 				ROLLBACK TRANSACTION @savepoint --werk van deze sproc ongedaan gemaakt
 				COMMIT TRANSACTION --trancount 1 omlaag
-				--PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
+				PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
 			END
 			DECLARE @errornumber int = ERROR_NUMBER();
 			DECLARE @errormessage varchar(2000) 
