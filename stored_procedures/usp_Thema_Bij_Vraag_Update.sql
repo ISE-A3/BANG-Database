@@ -14,7 +14,7 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		IF NOT EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			THROW 50229, 'De vraag bestaat niet', 1
+			THROW 50229, 'De vraag bestaat niet.', 1
 
 		DECLARE @VRAAG_ID int = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 
@@ -22,7 +22,7 @@ BEGIN
 			THROW 50224, 'De vraag heeft geen thema(''s).', 1
 		
 		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_NIEUW)
-			THROW 50223, 'De vraag heeft dit thema al,', 1
+			THROW 50223, 'De vraag heeft dit thema al.', 1
 		
 		IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_HUIDIG)
 			THROW 50225, 'De vraag heeft niet dit thema. Deze wijziging kan niet worden uitgevoerd.', 1
@@ -33,9 +33,8 @@ BEGIN
 		UPDATE THEMA_BIJ_VRAAG
 		SET THEMA = @THEMA_NIEUW
 		WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA_HUIDIG
-		
-		IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @THEMA_HUIDIG)
-			EXEC dbo.usp_Thema_Delete @THEMA_HUIDIG
+
+		EXEC dbo.usp_Thema_Delete
 			
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

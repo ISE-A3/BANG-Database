@@ -13,7 +13,7 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		IF NOT EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			THROW 50229, 'De vraag bestaat niet', 1
+			THROW 50229, 'De vraag bestaat niet.', 1
 
 		DECLARE @VRAAG_ID int = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 
@@ -31,8 +31,7 @@ BEGIN
 		DELETE FROM THEMA_BIJ_VRAAG
 		WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA 
 
-		IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @THEMA)
-			EXEC dbo.usp_Thema_Delete @THEMA
+		EXEC dbo.usp_Thema_Delete
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
