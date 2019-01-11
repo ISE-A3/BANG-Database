@@ -26,7 +26,7 @@ BEGIN
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
-		IF XACT_STATE() = -1 and @startTrancsount = 0  -- "doomed" transaction, eigen context only
+		IF XACT_STATE() = -1 and @startTrancount = 0  -- "doomed" transaction, eigen context only
 			BEGIN
 				ROLLBACK TRANSACTION
 				PRINT 'Buitentran state -1 eigen context'
