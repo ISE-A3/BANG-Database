@@ -92,7 +92,7 @@ BEGIN
 						)
 					)
 				)
-				EXECUTE dbo.usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete @VRAAGNAAM = @VRAAG_NAAM
+				EXECUTE dbo.usp_AlleAntwoordenVanAlleVraagonderdelenVanVraag_Delete @VRAAG_NAAM = @VRAAG_NAAM
 
 				DELETE FROM VRAAGONDERDEEL
 				WHERE VRAAG_ID = (
