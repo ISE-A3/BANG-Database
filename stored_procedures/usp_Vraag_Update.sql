@@ -6,9 +6,9 @@ UPDATE VRAAG
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Update
-@VRAAG_ID varchar(256) NOT NULL,
-@VRAAG_NAAM varchar (256) NOT NULL,
-@VRAAG_TITEL varchar(256) NULL
+	@OUDE_VRAAG_NAAM VARCHAR (256),
+	@NIEUWE_VRAAG_NAAM VARCHAR(256) = NULL,
+	@VRAAG_TITEL VARCHAR(256) = NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -18,16 +18,29 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 
 		--checks hier
-		--succes operatie hier
-		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_ID = @VRAAG_ID)
-			IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			 THROW 50222, 'Deze vraagnaam is al in gebruik.', 1
-			ELSE
-				UPDATE VRAAG
-				SET VRAAG_TITEL = @VRAAG_TITEL, VRAAG_NAAM = @VRAAG_NAAM
-				WHERE VRAAG_ID = @VRAAG_ID
-		ELSE
+		IF NOT EXISTS (
+			SELECT ''
+			FROM VRAAG
+			WHERE VRAAG_NAAM = @OUDE_VRAAG_NAAM
+			)
 			THROW 50221, 'Deze vraag bestaat niet.', 1
+
+		IF @NIEUWE_VRAAG_NAAM IS NOT NULL BEGIN
+			IF EXISTS (
+				SELECT ''
+				FROM VRAAG
+				WHERE VRAAG_NAAM = @NIEUWE_VRAAG_NAAM
+				)
+				THROW 50222, 'Deze vraagnaam is al in gebruik.', 1
+		END
+
+		--succes operatie hier
+		UPDATE VRAAG
+		SET	VRAAG_TITEL = ISNULL (@VRAAG_TITEL, VRAAG_TITEL),
+			VRAAG_NAAM = ISNULL (@NIEUWE_VRAAG_NAAM, VRAAG_NAAM)
+		WHERE VRAAG_NAAM = @OUDE_VRAAG_NAAM
+		AND	(@VRAAG_TITEL IS NOT NULL OR
+			@NIEUWE_VRAAG_NAAM IS NOT NULL)
 		
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
