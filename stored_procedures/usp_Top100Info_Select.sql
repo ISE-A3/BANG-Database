@@ -1,9 +1,8 @@
 use BANG
 go
 
-CREATE or ALTER PROCEDURE dbo.usp_Nummer_Insert 
-@titel varchar(256),
-@artiest varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Top100Info_Select 
+@EVENEMENT_NAAM varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,22 +11,13 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		if exists (	SELECT '' 
-						FROM NUMMER N 
-						INNER JOIN ARTIEST A 
-						ON N.ARTIEST_ID = A.ARTIEST_ID 
-						WHERE  NUMMER_TITEL = @titel 
-						AND ARTIEST_NAAM = @artiest
-					)
-		throw 50107, 'Dit nummer bestaat al.', 1;
+		IF NOT EXISTS (SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
+			THROW 50200, 'Het evenement bestaat niet', 1;
 
-		if not exists(select '' from ARTIEST where ARTIEST_NAAM = @artiest)
-		begin
-			execute dbo.usp_Artiest_Insert @artiest = @artiest;
-		end
-		
-		insert into NUMMER(NUMMER_TITEL, ARTIEST_ID)
-		values (@titel, (SELECT A.ARTIEST_ID FROM ARTIEST A WHERE A.ARTIEST_NAAM = @artiest));
+		IF NOT EXISTS (SELECT '' FROM TOP100 T INNER JOIN EVENEMENT E ON T.EVENEMENT_ID = E.EVENEMENT_ID WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM)
+			THROW 50201, 'Het evenement heeft geen top100', 1;
+
+		SELECT E.EVENEMENT_NAAM, E.EVENEMENT_DATUM, T.STARTDATUM, T.EINDDATUM FROM TOP100 T INNER JOIN EVENEMENT E ON T.EVENEMENT_ID = E.EVENEMENT_ID WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
@@ -42,7 +32,7 @@ BEGIN
 			BEGIN
 				ROLLBACK TRANSACTION @savepoint --werk van deze sproc ongedaan gemaakt
 				COMMIT TRANSACTION --trancount 1 omlaag
-				PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
+				--PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
 			END
 			DECLARE @errornumber int = ERROR_NUMBER();
 			DECLARE @errormessage varchar(2000) 

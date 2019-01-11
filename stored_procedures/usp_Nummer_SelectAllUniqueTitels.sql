@@ -1,12 +1,7 @@
 use BANG
 go
 
-/*
-DELETE EVENT
-*/
-
-CREATE or ALTER PROCEDURE dbo.usp_Evenement_Delete
-@EVENEMENT_NAAM varchar(256)
+CREATE or ALTER PROCEDURE dbo.usp_Nummer_SelectAllUniqueTitels
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -15,18 +10,7 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		IF EXISTS (SELECT '' FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM)
-		BEGIN
-			IF EXISTS (SELECT '' FROM TOP100 T INNER JOIN EVENEMENT E ON T.EVENEMENT_ID = E.EVENEMENT_ID WHERE E.EVENEMENT_NAAM = @EVENEMENT_NAAM)
-				EXEC usp_Top100_Delete @EVENEMENT_NAAM = @EVENEMENT_NAAM;
-
-			DELETE FROM EVENEMENT WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM;
-			EXEC usp_OngebruikteLocatie_DeleteAll;
-		END
-		ELSE
-			THROW 50204, 'Het evenement bestaat niet', 1
-
-		
+		SELECT DISTINCT n.NUMMER_TITEL from NUMMER n order by n.NUMMER_TITEL;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

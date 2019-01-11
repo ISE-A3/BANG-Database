@@ -16,17 +16,22 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		--checks hier
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
 
-			INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
-			VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
+		IF (@VRAAG_NAAM IS NULL)
+			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
+
+		--succes operatie hier
+		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
+		VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH
-		IF XACT_STATE() = -1 and @startTrancsount = 0  -- "doomed" transaction, eigen context only
+		IF XACT_STATE() = -1 and @startTrancount = 0  -- "doomed" transaction, eigen context only
 			BEGIN
 				ROLLBACK TRANSACTION
 				PRINT 'Buitentran state -1 eigen context'
