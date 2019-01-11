@@ -19,8 +19,11 @@ BEGIN
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
 
-			INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
-			VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
+		IF (@VRAAG_NAAM IS NULL)
+			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
+
+		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
+		VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
