@@ -1,4 +1,13 @@
-CREATE OR ALTER PROCEDURE usp_Stem_InsertStem (@evenementnaam VARCHAR(256), @mail VARCHAR(256), @naam VARCHAR(256), @weging INT, @titel VARCHAR(256), @artiest VARCHAR(256))
+use BANG
+go
+
+CREATE OR ALTER PROCEDURE usp_Stem_InsertStem 
+@evenementnaam VARCHAR(256), 
+@mail VARCHAR(256),
+@naam VARCHAR(256),
+@weging INT,
+@titel VARCHAR(256),
+@artiest VARCHAR(256)
 AS
 BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -11,8 +20,12 @@ BEGIN
 			IF NOT EXISTS(SELECT * FROM NUMMER N INNER JOIN ARTIEST A ON N.ARTIEST_ID = A.ARTIEST_ID WHERE NUMMER_TITEL = @titel AND ARTIEST_NAAM = @artiest)
 					EXECUTE usp_Nummer_Insert @titel = @titel, @artiest = @artiest;
 
-			IF EXISTS(SELECT * FROM EVENEMENT WHERE EVENEMENT_NAAM = @evenementnaam AND EVENEMENT_DATUM < GETDATE())
-				THROW 50300, 'Het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
+			IF datediff(DAY, GETDATE(), (SELECT EINDDATUM FROM TOP100 T INNER JOIN EVENEMENT E ON T.EVENEMENT_ID = E.EVENEMENT_ID WHERE E.EVENEMENT_NAAM = @evenementnaam)) < 0
+				THROW 50300, 'De stemperiode voor het evenement is al voorbij, er kunnen geen inzendingen meer worden gedaan.', 1
+			
+			IF datediff(DAY, GETDATE(), (SELECT STARTDATUM FROM TOP100 T INNER JOIN EVENEMENT E ON T.EVENEMENT_ID = E.EVENEMENT_ID WHERE E.EVENEMENT_NAAM = @evenementnaam)) > 0
+				THROW 50301, 'De stemperiode voor het evenement is nog niet gestart, er kunnen geen inzendingen worden gedaan.', 1
+			
 
 			IF NOT EXISTS(SELECT * FROM STEMMER WHERE EMAILADRES = @mail)
 			INSERT INTO STEMMER (EMAILADRES, STEMMER_NAAM) VALUES (@mail, @naam)
