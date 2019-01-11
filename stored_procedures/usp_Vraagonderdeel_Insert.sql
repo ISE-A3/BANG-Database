@@ -17,6 +17,10 @@ BEGIN
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
+		DECLARE @VRAAG_ID INT
+		SET @VRAAG_ID = (SELECT VRAAG_ID
+						FROM VRAAG
+						WHERE VRAAG_NAAM = @VRAAG_NAAM)
 
 		--checks hier
 		IF NOT EXISTS (
@@ -24,24 +28,32 @@ BEGIN
 			FROM VRAAG
 			WHERE VRAAG_NAAM = @VRAAG_NAAM
 			)
-			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1
+			THROW 50001, 'Er bestaat nog geen vraag voor dit vraagonderdeel', 1;
 
+		IF EXISTS (
+			SELECT ''
+			FROM VRAAGONDERDEEL
+			WHERE VRAAG_ID = @VRAAG_ID AND
+			VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
+			)
+			THROW 50402, 'Dit vraagonderdeelnummer bestaat al', 1;
+    
+		IF @VRAAGONDERDEELNUMMER > 1
+		BEGIN
+			IF NOT EXISTS (
+				SELECT '' 
+				FROM VRAAGONDERDEEL
+				WHERE (@VRAAGONDERDEELNUMMER - 1) IN (
+					SELECT VRAAGONDERDEELNUMMER
+					FROM VRAAGONDERDEEL
+					WHERE VRAAG_ID = @VRAAG_ID
+					)
+				)
+				THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1;
+		END
+    
 		IF (@VRAAGSOORT != 'O' AND @VRAAGSOORT != 'G')
 			THROW 50009, 'Het vraagsoort kan alleen O(open) of G(gesloten) zijn', 1
-		
-		IF EXISTS (
-            SELECT ''
-            FROM VRAAGONDERDEEL
-            WHERE VRAAG_ID = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			AND @VRAAGONDERDEELNUMMER != (
-				SELECT VRAAGONDERDEELNUMMER
-				FROM VRAAGONDERDEEL
-				GROUP BY VRAAGONDERDEELNUMMER
-				HAVING VRAAGONDERDEELNUMMER = (MAX(VRAAGONDERDEELNUMMER)+1)
-				)
-			)
-            THROW 50401, 'Vraagonderdeelnummer dient te beginnen bij 1 en te worden opgehoogt met 1 voor ieder volgend vraagonderdeel.', 1
-		ELSE
 
 		--succes operatie hier
 		INSERT INTO VRAAGONDERDEEL(VRAAG_ID, VRAAGONDERDEELNUMMER, VRAAGONDERDEEL, VRAAGSOORT)
