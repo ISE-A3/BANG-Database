@@ -2,7 +2,7 @@ use BANG
 GO
 
 CREATE or ALTER PROCEDURE dbo.usp_Thema_Delete
-@thema varchar(256)
+@THEMA varchar(256) = NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -11,6 +11,18 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		IF @THEMA IS NULL
+			DELETE FROM THEMA
+			WHERE THEMA NOT IN 	(
+				SELECT THEMA
+				FROM THEMA_BIJ_VRAAG
+				)
+				AND THEMA NOT IN (
+				SELECT THEMA
+				FROM PUBQUIZRONDE
+				)
+		IF @THEMA IS NOT NULL
+		BEGIN
 		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE THEMA = @thema)
 			THROW 50215, 'Thema kan niet verwijderd worden. Thema wordt gebruikt bij vragen', 1
 
@@ -22,7 +34,7 @@ BEGIN
 
 		DELETE FROM THEMA
 		WHERE Thema = @thema
-
+		END
 		COMMIT TRANSACTION 
 	END TRY	  
 	BEGIN CATCH

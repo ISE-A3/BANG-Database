@@ -2,8 +2,8 @@ USE BANG
 GO
 
 CREATE OR ALTER PROCEDURE dbo.usp_Thema_Bij_Vraag_Insert
-@VRAAG_NAAM varchar(256),
-@THEMA varchar(256) NOT NULL
+  @VRAAG_NAAM varchar(256),
+  @THEMA varchar(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -12,21 +12,19 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		IF NOT EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
+			THROW 50229, 'De vraag bestaat niet.', 1 
+
 		DECLARE @VRAAG_ID int = (SELECT VRAAG_ID FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 
 		IF EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA)
 			THROW 50223, 'De vraag heeft dit thema al.', 1
-		ELSE
-		BEGIN
-			IF NOT EXISTS (SELECT '' FROM THEMA WHERE THEMA = @THEMA)
-			BEGIN
-				EXEC dbo.usp_Thema_Insert @Thema
-			END
+		
+		IF NOT EXISTS (SELECT '' FROM THEMA WHERE THEMA = @THEMA)
+			EXEC dbo.usp_Thema_Insert @THEMA
 
-			INSERT INTO THEMA_BIJ_VRAAG(VRAAG_ID, THEMA)
-			VALUES (@VRAAG_ID, @THEMA)
-		END
-			
+		INSERT INTO THEMA_BIJ_VRAAG(VRAAG_ID, THEMA)
+		VALUES (@VRAAG_ID, @THEMA)
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
