@@ -1,13 +1,11 @@
-USE BANG
-GO
+use BANG
+go
 
 /*
-INSERT VRAAG
+SELECT ALL
 */
 
-CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert
-@VRAAG_NAAM varchar(256),
-@VRAAG_TITEL varchar(256) = NULL
+CREATE or ALTER PROCEDURE dbo.usp_Vraag_SelectAll
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -16,16 +14,9 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
-		--checks hier
-		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
-			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
-
-		IF (@VRAAG_NAAM IS NULL)
-			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
-
-		--succes operatie hier
-		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
-		VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
+		SELECT V.VRAAG_NAAM, V.VRAAG_TITEL, TBV.THEMA, COUNT(VRAAGONDERDEELNUMMER) AS Aantal_onderdelen
+		FROM VRAAG V INNER JOIN THEMA_BIJ_VRAAG TBV ON V.VRAAG_ID = TBV.VRAAG_ID INNER JOIN VRAAGONDERDEEL VO ON V.VRAAG_ID = VO.VRAAG_ID
+		GROUP BY V.VRAAG_NAAM, V.VRAAG_TITEL, TBV.THEMA
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
