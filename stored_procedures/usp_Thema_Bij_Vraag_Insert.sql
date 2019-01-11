@@ -2,7 +2,7 @@ USE BANG
 GO
 
 CREATE OR ALTER PROCEDURE dbo.usp_Thema_Bij_Vraag_Insert
-@VRAAG_NAAM varchar(256) NOT NULL,
+@VRAAG_NAAM varchar(256),
 @THEMA varchar(256) NOT NULL
 AS
 BEGIN  
