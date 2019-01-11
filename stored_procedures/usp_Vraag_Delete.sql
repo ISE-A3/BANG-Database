@@ -6,7 +6,7 @@ DELETE VRAAG
 */
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Delete
-	@VRAAG_NAAM varchar(256)
+	@VRAAG_NAAM VARCHAR(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -38,13 +38,24 @@ BEGIN
 		IF EXISTS (
 			SELECT ''
 			FROM VRAAGONDERDEEL
-			WHERE VRAAG_ID IN (
+			WHERE VRAAG_ID = (
 				SELECT VRAAG_ID
 				FROM VRAAG
 				WHERE VRAAG_NAAM = @VRAAG_NAAM
 				)
 			)
 			EXECUTE dbo.usp_Vraagonderdeel_Delete @VRAAG_NAAM = @VRAAG_NAAM
+
+			IF EXISTS (
+				SELECT ''
+				FROM THEMA_BIJ_VRAAG
+				WHERE VRAAG_ID = (
+					SELECT VRAAG_ID
+					FROM VRAAG
+					WHERE VRAAG_NAAM = @VRAAG_NAAM
+					) 
+				)
+				EXECUTE dbo.usp_Thema_Bij_Vraag_Delete @VRAAG_NAAM = @VRAAG_NAAM
 
 		DELETE FROM VRAAG
 		WHERE VRAAG_NAAM = @VRAAG_NAAM

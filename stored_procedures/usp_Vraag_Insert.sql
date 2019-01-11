@@ -16,12 +16,14 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		--checks hier
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VRAAG_NAAM = @VRAAG_NAAM)
 			THROW 50220, 'Een vraag met deze vraagnaam bestaal al.', 1 
 
 		IF (@VRAAG_NAAM IS NULL)
 			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
 
+		--succes operatie hier
 		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
 		VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
 
