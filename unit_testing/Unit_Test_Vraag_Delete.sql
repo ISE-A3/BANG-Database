@@ -93,5 +93,30 @@ BEGIN
 END
 GO
 
+CREATE PROC [UnitTestVraag].[Test dat eventuele thema's van een vraag ook gedelete worden]
+AS
+BEGIN
+	IF OBJECT_ID('verwacht') IS NOT NULL DROP TABLE verwacht
+
+	EXEC tSQLt.FakeTable 'dbo', 'THEMA_BIJ_VRAAG', @Identity = 1
+	INSERT INTO [dbo].[THEMA_BIJ_VRAAG]
+	VALUES	(5, 'Foto'),
+			(5, 'Moordzaken'),
+			(1, 'Foto'),
+			(1, 'Moordzaken')
+
+	CREATE TABLE verwacht (
+		[VRAAG_ID] INT,
+		[THEMA] VARCHAR(256)
+		)
+	INSERT INTO verwacht
+	VALUES	(1, 'Foto'),
+			(1, 'Moordzaken')
+
+	EXEC dbo.usp_Vraag_Delete @VRAAG_NAAM = 'Shot bij Corbijn: Martijn'
+	EXEC tSQLt.AssertEqualsTable @Expected = 'verwacht', @Actual = '[dbo].[THEMA_BIJ_VRAAG]'
+END
+GO
+
 EXEC tSQLt.RunAll
 GO
