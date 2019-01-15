@@ -2,11 +2,7 @@ USE BANG;
 GO
 
 CREATE or ALTER PROCEDURE dbo.usp_Top100_SelectTop100
-	@EvenementNaam varchar(256),
-	@EvenementDatum date,
-	@Plaatsnaam varchar(1024),
-	@Adres varchar(2014),
-	@Huisnummer integer
+	@EvenementNaam varchar(256)
 AS
 BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -22,10 +18,6 @@ BEGIN
 			SELECT EVENEMENT_ID
 			FROM EVENEMENT
 			WHERE EVENEMENT_NAAM = @EvenementNaam
-			AND EVENEMENT_DATUM = @EvenementDatum
-			AND PLAATSNAAM = @Plaatsnaam
-			AND ADRES = @Adres
-			AND HUISNUMMER = @Huisnummer
 			)
 		GROUP BY n1.NUMMER_TITEL, A.ARTIEST_NAAM
 		ORDER BY score DESC;
