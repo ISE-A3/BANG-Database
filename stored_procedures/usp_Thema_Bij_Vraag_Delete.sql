@@ -21,15 +21,17 @@ BEGIN
 			THROW 50224, 'De vraag heeft geen thema(''s).', 1
 
 		IF @THEMA IS NOT NULL
+		BEGIN
 			IF NOT EXISTS (SELECT '' FROM THEMA_BIJ_VRAAG WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA)
 				THROW 50226, 'Het thema bij de vraag kan niet verwijderd worden, want de vraag heeft dit thema niet.', 1
+
+			DELETE FROM THEMA_BIJ_VRAAG
+			WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA 
+		END
 
 		IF @THEMA IS NULL
 			DELETE FROM THEMA_BIJ_VRAAG
 			WHERE VRAAG_ID = @VRAAG_ID
-
-		DELETE FROM THEMA_BIJ_VRAAG
-		WHERE VRAAG_ID = @VRAAG_ID AND THEMA = @THEMA 
 
 		EXEC dbo.usp_Thema_Delete
 
