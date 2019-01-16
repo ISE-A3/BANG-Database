@@ -614,16 +614,6 @@ create table EVENEMENT (
 )
 go
 
-/*==============================================================*/
-/* Index: EVENEMENT_OP_LOCATIE_FK                               */
-/*==============================================================*/
-create index EVENEMENT_OP_LOCATIE_FK on EVENEMENT (
-PLAATSNAAM ASC,
-ADRES ASC,
-HUISNUMMER ASC,
-HUISNUMMER_TOEVOEGING ASC
-)
-go
 
 /*==============================================================*/
 /* Table: LOCATIE                                               */
@@ -689,14 +679,6 @@ EVENEMENT_ID ASC
 go
 
 /*==============================================================*/
-/* Index: THEMA_VAN_PUBQUIZRONDE_FK                             */
-/*==============================================================*/
-create index THEMA_VAN_PUBQUIZRONDE_FK on PUBQUIZRONDE (
-THEMA ASC
-)
-go
-
-/*==============================================================*/
 /* Table: PUBQUIZRONDEVRAAG                                     */
 /*==============================================================*/
 create table PUBQUIZRONDEVRAAG (
@@ -754,14 +736,6 @@ EVENEMENT_ID ASC
 go
 
 /*==============================================================*/
-/* Index: STEM_VAN_STEMMER_FK                                   */
-/*==============================================================*/
-create index STEM_VAN_STEMMER_FK on STEM (
-EMAILADRES ASC
-)
-go
-
-/*==============================================================*/
 /* Table: STEMMER                                               */
 /*==============================================================*/
 create table STEMMER (
@@ -795,14 +769,6 @@ go
 /*==============================================================*/
 create index THEMA_BIJ_VRAAG_FK on THEMA_BIJ_VRAAG (
 VRAAG_ID ASC
-)
-go
-
-/*==============================================================*/
-/* Index: THEMA_BIJ_VRAAG2_FK                                   */
-/*==============================================================*/
-create index THEMA_BIJ_VRAAG2_FK on THEMA_BIJ_VRAAG (
-THEMA ASC
 )
 go
 
