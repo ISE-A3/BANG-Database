@@ -11,7 +11,7 @@ BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZRONDEVRAAG';
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAG';
 
-	EXEC [tSQLt].[ExpectNoException] 
+	
 
 	IF OBJECTPROPERTY(OBJECT_ID('[dbo].[EVENEMENT]'), 'TableHasIdentity') = 1
 	SET IDENTITY_INSERT [dbo].[EVENEMENT] ON
@@ -30,10 +30,24 @@ BEGIN
 	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 2, 'Geschiedenis', 'Oudheid';
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1
 
-	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 3, 'Wiskunde', 'Pythagoras';		--test voor ronde nummer & thema update
-	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Wiskunde', 'Pythagoras';		--test voor thema update
-	--EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Algemeen';						--test voor NULL waarde
+	--TEST 1) test voor ronde nummer & thema update
+	EXEC [tSQLt].[ExpectNoException] 
 
+	EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 3, 'Wiskunde', 'Pythagoras';
+
+	/*
+	--TEST 2) test voor thema update
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Wiskunde', 'Pythagoras';
+	*/
+
+	/*
+	--TEST 3) test voor NULL waarde
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizronde_Update 'Pubquiz1', 1, 1, 'Algemeen';	
+	*/
 END
 GO
 

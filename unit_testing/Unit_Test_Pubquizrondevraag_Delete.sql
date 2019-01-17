@@ -11,8 +11,6 @@ BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZRONDEVRAAG';
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAG';
 
-	EXEC [tSQLt].[ExpectNoException] 
-
 	IF OBJECTPROPERTY(OBJECT_ID('[dbo].[EVENEMENT]'), 'TableHasIdentity') = 1
 	SET IDENTITY_INSERT [dbo].[EVENEMENT] ON
 
@@ -31,11 +29,27 @@ BEGIN
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1;
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen 2018', 2;
 
+	--TEST 1) test voor NULL waarde
+	EXEC [tSQLt].[ExpectNoException] 
 
-	--EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1;		--test voor NULL waarde
-	--EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 3;	--test voor foutieve invoer		
-	--EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 1;	--test voor multiple rows en volgnr 1
-	--EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 2;	--test voor multiple rows en volgnr 1
+	EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1;
+
+	/*
+	--TEST 2) test voor foutieve invoer
+	EXEC [tSQLt].[ExpectException] @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Pubquizrondevraag_Delete''.
+			Originele boodschap: ''De vraag van deze ronde bestaat niet'''
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 3;
+	*/
+
+	/*
+	--TEST 3) test voor multiple rows en volgnr 1
+	EXEC [tSQLt].[ExpectNoException]
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 1
+	EXECUTE dbo.usp_Pubquizrondevraag_Delete 'Pubquiz1', 1, 2
+	*/
+	
 END
 GO
 

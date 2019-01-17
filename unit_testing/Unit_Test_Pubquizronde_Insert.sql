@@ -9,7 +9,7 @@ BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'EVENEMENT';
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZRONDE';
 
-	EXEC [tSQLt].[ExpectNoException] 
+	
 
 	IF OBJECTPROPERTY(OBJECT_ID('[dbo].[EVENEMENT]'), 'TableHasIdentity') = 1
 	SET IDENTITY_INSERT [dbo].[EVENEMENT] ON
@@ -19,10 +19,27 @@ BEGIN
 	
 	EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test';
 
-	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal';
-	--EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal';	--test voor foute (dubbele) invoer
-	--EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 2, 'Geschiedenis', 'geen';	--test voor multiple rows
+	--TEST 1) Test voor invoeren van Pubquizronde
+	EXEC [tSQLt].[ExpectNoException] 
 
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal';
+
+	/*
+	--TEST 2) test voor foute (dubbele) invoer
+	EXEC [tSQLt].[ExpectException] @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Pubquizronde_Insert''.
+			Originele boodschap: ''De ronde van dit evenement is al ingevuld'''
+
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal'
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal';
+	*/
+
+	/*
+	--TEST 3) test voor multiple rows
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 'voetbal'
+	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 2, 'Sport', 'tennis'
+	*/
 END
 GO
 

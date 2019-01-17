@@ -8,8 +8,6 @@ BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZ';
 	EXEC tSQLt.FakeTable 'dbo', 'EVENEMENT';
 
-	EXEC [tSQLt].[ExpectNoException] 
-
 	IF OBJECTPROPERTY(OBJECT_ID('[dbo].[EVENEMENT]'), 'TableHasIdentity') = 1
 	SET IDENTITY_INSERT [dbo].[EVENEMENT] ON
 
@@ -18,9 +16,24 @@ BEGIN
 	
 	EXECUTE dbo.usp_Pubquiz_Insert 'Pubquiz1', 'Pubquiz_Insert_test';
 
-	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', 'Pubquiz_titel_test';	--test voor update pubquiz titel
-	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz2', 'Pubquiz_titel_test';	--test voor foutieve invoer evenement
-	--EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', NULL;	--test voor NULL waarde
+	--TEST 1) test voor update pubquiz titel
+	EXECUTE [tSQLt].[ExpectNoException] 
+	EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', 'Pubquiz_titel_test';
+
+	/*
+	--TEST 2) test voor foutieve invoer evenement
+	EXECUTE [tSQLt].[ExpectException] @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Pubquiz_Update''.
+			Originele boodschap: ''Er bestaat geen pubquiz voor dit evenement'''
+	EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz2', 'Pubquiz_titel_test';
+	*/
+
+	/*
+	--TEST 3) test voor NULL waarde
+	EXECUTE [tSQLt].[ExpectException] @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Pubquiz_Update''.
+			Originele boodschap: ''Vul een pubquiz titel in voor dit evenement'''
+	EXECUTE dbo.usp_Pubquiz_Update 'Pubquiz1', NULL;
+	*/
+	
 END
 GO
 
