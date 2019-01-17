@@ -12,8 +12,6 @@ BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
 	DECLARE @startTrancount int = @@TRANCOUNT;
 	BEGIN TRY
-	IF(@@Rowcount = 0) RETURN
-	SET NOCOUNT ON
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
     

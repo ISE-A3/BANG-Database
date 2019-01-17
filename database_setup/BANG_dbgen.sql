@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     8-1-2019 14:07:15                            */
+/* Created on:     15-1-2019 10:00:34                            */
 /*==============================================================*/
 
 USE master
@@ -686,7 +686,8 @@ create table PUBQUIZRONDEVRAAG (
    RONDENUMMER          VOLGNUMMER           not null,
    VRAAG_ID             SURROGATE_KEY        not null,
    VRAAGNUMMER          VOLGNUMMER           not null,
-   constraint PK_PUBQUIZRONDEVRAAG primary key nonclustered (EVENEMENT_ID, RONDENUMMER, VRAAG_ID, VRAAGNUMMER)
+   constraint PK_PUBQUIZRONDEVRAAG primary key nonclustered (EVENEMENT_ID, RONDENUMMER, VRAAG_ID),
+   constraint AK_ALTERNATIVE_PUBQUIZR unique (EVENEMENT_ID, RONDENUMMER, VRAAGNUMMER)
 )
 go
 
