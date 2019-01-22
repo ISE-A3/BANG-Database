@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     22-1-2019 10:41:30                           */
+/* Created on:     22-1-2019 14:51:52                           */
 /*==============================================================*/
 
 USE master
@@ -31,7 +31,7 @@ alter table ALTERNATIEVEPUNTEN
 go
 
 if exists (select 1
-   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')																								  
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('ANTWOORD') and o.name = 'FK_ANTWOORD_ANTWOORD__VRAAGOND')
 alter table ANTWOORD
    drop constraint FK_ANTWOORD_ANTWOORD__VRAAGOND
@@ -39,9 +39,44 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('DEELNEMER_IN_EEN_TEAM') and o.name = 'FK_DEELNEME_DEELNEMER_TEAM')
+alter table DEELNEMER_IN_EEN_TEAM
+   drop constraint FK_DEELNEME_DEELNEMER_TEAM
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('DEELNEMER_IN_EEN_TEAM') and o.name = 'FK_DEELNEME_DEELNEMER_DEELNEME')
+alter table DEELNEMER_IN_EEN_TEAM
+   drop constraint FK_DEELNEME_DEELNEMER_DEELNEME
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('EVENEMENT') and o.name = 'FK_EVENEMEN_EVENEMENT_LOCATIE')
 alter table EVENEMENT
    drop constraint FK_EVENEMEN_EVENEMENT_LOCATIE
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('GEGEVENANTWOORD') and o.name = 'FK_GEGEVENA_ANTWOORD__PUBQUIZR')
+alter table GEGEVENANTWOORD
+   drop constraint FK_GEGEVENA_ANTWOORD__PUBQUIZR
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('GEGEVENANTWOORD') and o.name = 'FK_GEGEVENA_ANTWOORD__TEAM')
+alter table GEGEVENANTWOORD
+   drop constraint FK_GEGEVENA_ANTWOORD__TEAM
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('GEGEVENANTWOORD') and o.name = 'FK_GEGEVENA_GEGEVEN_A_VRAAGOND')
+alter table GEGEVENANTWOORD
+   drop constraint FK_GEGEVENA_GEGEVEN_A_VRAAGOND
 go
 
 if exists (select 1
@@ -109,6 +144,13 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('TEAM') and o.name = 'FK_TEAM_TEAM_DEEL_PUBQUIZ')
+alter table TEAM
+   drop constraint FK_TEAM_TEAM_DEEL_PUBQUIZ
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('THEMA_BIJ_VRAAG') and o.name = 'FK_THEMA_BI_THEMA_BIJ_VRAAG')
 alter table THEMA_BIJ_VRAAG
    drop constraint FK_THEMA_BI_THEMA_BIJ_VRAAG
@@ -130,9 +172,51 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VRAAG') and o.name = 'FK_VRAAG_AFBEELDIN_AFBEELDI')
+alter table VRAAG
+   drop constraint FK_VRAAG_AFBEELDIN_AFBEELDI
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VRAAG') and o.name = 'FK_VRAAG_AUDIO_BIJ_AUDIO')
+alter table VRAAG
+   drop constraint FK_VRAAG_AUDIO_BIJ_AUDIO
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VRAAG') and o.name = 'FK_VRAAG_VIDEO_BIJ_VIDEO')
+alter table VRAAG
+   drop constraint FK_VRAAG_VIDEO_BIJ_VIDEO
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VRAAGONDERDEEL') and o.name = 'FK_VRAAGOND_AFBEELDIN_AFBEELDI')
+alter table VRAAGONDERDEEL
+   drop constraint FK_VRAAGOND_AFBEELDIN_AFBEELDI
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('VRAAGONDERDEEL') and o.name = 'FK_VRAAGOND_AUDIO_BIJ_AUDIO')
+alter table VRAAGONDERDEEL
+   drop constraint FK_VRAAGOND_AUDIO_BIJ_AUDIO
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('VRAAGONDERDEEL') and o.name = 'FK_VRAAGOND_VRAAGONDE_VRAAG')
 alter table VRAAGONDERDEEL
    drop constraint FK_VRAAGOND_VRAAGONDE_VRAAG
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('AFBEELDING')
+            and   type = 'U')
+   drop table AFBEELDING
 go
 
 if exists (select 1
@@ -184,6 +268,45 @@ if exists (select 1
 go
 
 if exists (select 1
+            from  sysobjects
+           where  id = object_id('AUDIO')
+            and   type = 'U')
+   drop table AUDIO
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('DEELNEMER')
+            and   type = 'U')
+   drop table DEELNEMER
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('DEELNEMER_IN_EEN_TEAM')
+            and   name  = 'DEELNEMER_IN_EEN_TEAM2_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index DEELNEMER_IN_EEN_TEAM.DEELNEMER_IN_EEN_TEAM2_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('DEELNEMER_IN_EEN_TEAM')
+            and   name  = 'DEELNEMER_IN_EEN_TEAM_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index DEELNEMER_IN_EEN_TEAM.DEELNEMER_IN_EEN_TEAM_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('DEELNEMER_IN_EEN_TEAM')
+            and   type = 'U')
+   drop table DEELNEMER_IN_EEN_TEAM
+go
+
+if exists (select 1
             from  sysindexes
            where  id    = object_id('EVENEMENT')
             and   name  = 'EVENEMENT_OP_LOCATIE_FK'
@@ -197,6 +320,40 @@ if exists (select 1
            where  id = object_id('EVENEMENT')
             and   type = 'U')
    drop table EVENEMENT
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('GEGEVENANTWOORD')
+            and   name  = 'GEGEVEN_ANTWOORD_OP_VRAAGONDERDEEL_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index GEGEVENANTWOORD.GEGEVEN_ANTWOORD_OP_VRAAGONDERDEEL_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('GEGEVENANTWOORD')
+            and   name  = 'ANTWOORD_BINNEN_RONDEVRAAG_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index GEGEVENANTWOORD.ANTWOORD_BINNEN_RONDEVRAAG_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('GEGEVENANTWOORD')
+            and   name  = 'ANTWOORD_VAN_TEAM_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index GEGEVENANTWOORD.ANTWOORD_VAN_TEAM_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('GEGEVENANTWOORD')
+            and   type = 'U')
+   drop table GEGEVENANTWOORD
 go
 
 if exists (select 1
@@ -321,6 +478,22 @@ if exists (select 1
 go
 
 if exists (select 1
+            from  sysindexes
+           where  id    = object_id('TEAM')
+            and   name  = 'TEAM_DEELNEMEND_AAN_PUBQUIZ_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index TEAM.TEAM_DEELNEMEND_AAN_PUBQUIZ_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('TEAM')
+            and   type = 'U')
+   drop table TEAM
+go
+
+if exists (select 1
             from  sysobjects
            where  id = object_id('THEMA')
             and   type = 'U')
@@ -361,9 +534,61 @@ go
 
 if exists (select 1
             from  sysobjects
+           where  id = object_id('VIDEO')
+            and   type = 'U')
+   drop table VIDEO
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('VRAAG')
+            and   name  = 'VIDEO_BIJ_VRAAG_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index VRAAG.VIDEO_BIJ_VRAAG_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('VRAAG')
+            and   name  = 'AFBEELDING_BIJ_VRAAG_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index VRAAG.AFBEELDING_BIJ_VRAAG_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('VRAAG')
+            and   name  = 'AUDIO_BIJ_VRAAG_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index VRAAG.AUDIO_BIJ_VRAAG_FK
+go
+
+if exists (select 1
+            from  sysobjects
            where  id = object_id('VRAAG')
             and   type = 'U')
    drop table VRAAG
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('VRAAGONDERDEEL')
+            and   name  = 'AFBEELDING_BIJ_VRAAGONDERDEEL_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index VRAAGONDERDEEL.AFBEELDING_BIJ_VRAAGONDERDEEL_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('VRAAGONDERDEEL')
+            and   name  = 'AUDIO_BIJ_VRAAGONDERDEEL_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index VRAAGONDERDEEL.AUDIO_BIJ_VRAAGONDERDEEL_FK
 go
 
 if exists (select 1
@@ -388,6 +613,10 @@ go
 
 if exists(select 1 from systypes where name='ANTWOORD_OPTIE')
    drop type ANTWOORD_OPTIE
+go
+
+if exists(select 1 from systypes where name='BESTANDSLOCATIE')
+   drop type BESTANDSLOCATIE
 go
 
 if exists(select 1 from systypes where name='DATUM')
@@ -499,6 +728,13 @@ create type ANTWOORD_OPTIE
 go
 
 /*==============================================================*/
+/* Domain: BESTANDSLOCATIE                                      */
+/*==============================================================*/
+create type BESTANDSLOCATIE
+   from varchar(256)
+go
+
+/*==============================================================*/
 /* Domain: DATUM                                                */
 /*==============================================================*/
 create type DATUM
@@ -606,15 +842,25 @@ execute sp_bindrule R_WEGING, WEGING
 go
 
 /*==============================================================*/
+/* Table: AFBEELDING                                            */
+/*==============================================================*/
+create table AFBEELDING (
+   AFBEELDING_BESTANDSNAAM NAAM                 not null,
+   AFBEELDING_BESTANDLOCATIE BESTANDSLOCATIE      not null,
+   constraint PK_AFBEELDING primary key nonclustered (AFBEELDING_BESTANDSNAAM),
+   constraint AK_ALTERNATIVE_AFBEELDI unique (AFBEELDING_BESTANDLOCATIE)
+)
+go
+
+/*==============================================================*/
 /* Table: ALTERNATIEVEPUNTEN                                    */
 /*==============================================================*/
 create table ALTERNATIEVEPUNTEN (
    EVENEMENT_ID         SURROGATE_KEY        not null,
    RONDENUMMER          VOLGNUMMER           not null,
-   VRAAG_ID             SURROGATE_KEY        not null,
    ANTWOORD_ID          SURROGATE_KEY        not null,
    ALTERNATIEVE_PUNTEN  PUNTEN               not null,
-   constraint PK_ALTERNATIEVEPUNTEN primary key (EVENEMENT_ID, RONDENUMMER, VRAAG_ID, ANTWOORD_ID)
+   constraint PK_ALTERNATIEVEPUNTEN primary key (EVENEMENT_ID, RONDENUMMER, ANTWOORD_ID)
 )
 go
 
@@ -623,8 +869,7 @@ go
 /*==============================================================*/
 create index ALTERNATIEVE_PUNTEN_BIJ_EEN_RONDE_FK on ALTERNATIEVEPUNTEN (
 EVENEMENT_ID ASC,
-RONDENUMMER ASC,
-VRAAG_ID ASC
+RONDENUMMER ASC
 )
 go
 
@@ -642,10 +887,10 @@ go
 create table ANTWOORD (
    ANTWOORD_ID          SURROGATE_KEY        identity,
    VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
-   ANTWOORD             ANTWOORD_OPTIE       not null,
+   GEGEVEN_ANTWOORD     ANTWOORD_OPTIE       not null,
    PUNTEN               PUNTEN               not null,
    constraint PK_ANTWOORD primary key nonclustered (ANTWOORD_ID),
-   constraint AK_NATURAL_ANTWOORD unique (ANTWOORD, VRAAGONDERDEEL_ID)
+   constraint AK_NATURAL_ANTWOORD unique (GEGEVEN_ANTWOORD, VRAAGONDERDEEL_ID)
 )
 go
 
@@ -665,6 +910,55 @@ create table ARTIEST (
    ARTIEST_NAAM         NAAM                 not null,
    constraint PK_ARTIEST primary key nonclustered (ARTIEST_ID),
    constraint AK_NATURAL_ARTIEST unique (ARTIEST_NAAM)
+)
+go
+
+/*==============================================================*/
+/* Table: AUDIO                                                 */
+/*==============================================================*/
+create table AUDIO (
+   AUDIO_BESTANDSNAAM   NAAM                 not null,
+   AUDIO_BESTANDSLOCATIE BESTANDSLOCATIE      not null,
+   constraint PK_AUDIO primary key nonclustered (AUDIO_BESTANDSNAAM),
+   constraint AK_ALTERNATIVE_AUDIO unique (AUDIO_BESTANDSLOCATIE)
+)
+go
+
+/*==============================================================*/
+/* Table: DEELNEMER                                             */
+/*==============================================================*/
+create table DEELNEMER (
+   EMAIL_ADRES          EMAILADRES           not null,
+   DEELNEMER_NAAM       NAAM                 null,
+   constraint PK_DEELNEMER primary key nonclustered (EMAIL_ADRES)
+)
+go
+
+/*==============================================================*/
+/* Table: DEELNEMER_IN_EEN_TEAM                                 */
+/*==============================================================*/
+create table DEELNEMER_IN_EEN_TEAM (
+   EVENEMENT_ID         SURROGATE_KEY        not null,
+   TEAM_NAAM            NAAM                 not null,
+   EMAIL_ADRES          EMAILADRES           not null,
+   constraint PK_DEELNEMER_IN_EEN_TEAM primary key (EVENEMENT_ID, TEAM_NAAM, EMAIL_ADRES)
+)
+go
+
+/*==============================================================*/
+/* Index: DEELNEMER_IN_EEN_TEAM_FK                              */
+/*==============================================================*/
+create index DEELNEMER_IN_EEN_TEAM_FK on DEELNEMER_IN_EEN_TEAM (
+EVENEMENT_ID ASC,
+TEAM_NAAM ASC
+)
+go
+
+/*==============================================================*/
+/* Index: DEELNEMER_IN_EEN_TEAM2_FK                             */
+/*==============================================================*/
+create index DEELNEMER_IN_EEN_TEAM2_FK on DEELNEMER_IN_EEN_TEAM (
+EMAIL_ADRES ASC
 )
 go
 
@@ -692,6 +986,46 @@ PLAATSNAAM ASC,
 ADRES ASC,
 HUISNUMMER ASC,
 HUISNUMMER_TOEVOEGING ASC
+)
+go
+
+/*==============================================================*/
+/* Table: GEGEVENANTWOORD                                       */
+/*==============================================================*/
+create table GEGEVENANTWOORD (
+   EVENEMENT_ID         SURROGATE_KEY        not null,
+   TEAM_NAAM            NAAM                 not null,
+   RONDENUMMER          VOLGNUMMER           not null,
+   VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
+   GEGEVEN_ANTWOORD     ANTWOORD_OPTIE       not null,
+   VERDIENDE_PUNTEN     PUNTEN               null,
+   constraint PK_GEGEVENANTWOORD primary key (EVENEMENT_ID, TEAM_NAAM, RONDENUMMER, VRAAGONDERDEEL_ID)
+)
+go
+
+/*==============================================================*/
+/* Index: ANTWOORD_VAN_TEAM_FK                                  */
+/*==============================================================*/
+create index ANTWOORD_VAN_TEAM_FK on GEGEVENANTWOORD (
+EVENEMENT_ID ASC,
+TEAM_NAAM ASC
+)
+go
+
+/*==============================================================*/
+/* Index: ANTWOORD_BINNEN_RONDEVRAAG_FK                         */
+/*==============================================================*/
+create index ANTWOORD_BINNEN_RONDEVRAAG_FK on GEGEVENANTWOORD (
+EVENEMENT_ID ASC,
+RONDENUMMER ASC
+)
+go
+
+/*==============================================================*/
+/* Index: GEGEVEN_ANTWOORD_OP_VRAAGONDERDEEL_FK                 */
+/*==============================================================*/
+create index GEGEVEN_ANTWOORD_OP_VRAAGONDERDEEL_FK on GEGEVENANTWOORD (
+VRAAGONDERDEEL_ID ASC
 )
 go
 
@@ -774,7 +1108,7 @@ create table PUBQUIZRONDEVRAAG (
    RONDENUMMER          VOLGNUMMER           not null,
    VRAAG_ID             SURROGATE_KEY        not null,
    VRAAGNUMMER          VOLGNUMMER           not null,
-   constraint PK_PUBQUIZRONDEVRAAG primary key nonclustered (EVENEMENT_ID, RONDENUMMER, VRAAG_ID),
+   constraint PK_PUBQUIZRONDEVRAAG primary key (EVENEMENT_ID, RONDENUMMER, VRAAG_ID),
    constraint AK_ALTERNATIVE_PUBQUIZR unique (EVENEMENT_ID, RONDENUMMER, VRAAGNUMMER)
 )
 go
@@ -843,6 +1177,24 @@ create table STEMMER (
 go
 
 /*==============================================================*/
+/* Table: TEAM                                                  */
+/*==============================================================*/
+create table TEAM (
+   EVENEMENT_ID         SURROGATE_KEY        not null,
+   TEAM_NAAM            NAAM                 not null,
+   constraint PK_TEAM primary key nonclustered (EVENEMENT_ID, TEAM_NAAM)
+)
+go
+
+/*==============================================================*/
+/* Index: TEAM_DEELNEMEND_AAN_PUBQUIZ_FK                        */
+/*==============================================================*/
+create index TEAM_DEELNEMEND_AAN_PUBQUIZ_FK on TEAM (
+EVENEMENT_ID ASC
+)
+go
+
+/*==============================================================*/
 /* Table: THEMA                                                 */
 /*==============================================================*/
 create table THEMA (
@@ -889,14 +1241,52 @@ create table TOP100 (
 go
 
 /*==============================================================*/
+/* Table: VIDEO                                                 */
+/*==============================================================*/
+create table VIDEO (
+   VIDEO_BESTANDSNAAM   NAAM                 not null,
+   VIDEO_BESTANDSLOCATIE BESTANDSLOCATIE      not null,
+   constraint PK_VIDEO primary key nonclustered (VIDEO_BESTANDSNAAM),
+   constraint AK_ALTERNATIVE_VIDEO unique (VIDEO_BESTANDSLOCATIE)
+)
+go
+
+/*==============================================================*/
 /* Table: VRAAG                                                 */
 /*==============================================================*/
 create table VRAAG (
    VRAAG_ID             SURROGATE_KEY        identity,
    VRAAG_NAAM           NAAM                 not null,
    VRAAG_TITEL          NAAM                 null,
+   AFBEELDING_BESTANDSNAAM NAAM                 null,
+   AUDIO_BESTANDSNAAM   NAAM                 null,
+   VIDEO_BESTANDSNAAM   NAAM                 null,
    constraint PK_VRAAG primary key nonclustered (VRAAG_ID),
    constraint AK_NATURAL_VRAAG unique (VRAAG_NAAM)
+)
+go
+
+/*==============================================================*/
+/* Index: AUDIO_BIJ_VRAAG_FK                                    */
+/*==============================================================*/
+create index AUDIO_BIJ_VRAAG_FK on VRAAG (
+AUDIO_BESTANDSNAAM ASC
+)
+go
+
+/*==============================================================*/
+/* Index: AFBEELDING_BIJ_VRAAG_FK                               */
+/*==============================================================*/
+create index AFBEELDING_BIJ_VRAAG_FK on VRAAG (
+AFBEELDING_BESTANDSNAAM ASC
+)
+go
+
+/*==============================================================*/
+/* Index: VIDEO_BIJ_VRAAG_FK                                    */
+/*==============================================================*/
+create index VIDEO_BIJ_VRAAG_FK on VRAAG (
+VIDEO_BESTANDSNAAM ASC
 )
 go
 
@@ -909,6 +1299,8 @@ create table VRAAGONDERDEEL (
    VRAAGONDERDEELNUMMER VOLGNUMMER           not null,
    VRAAGONDERDEEL       QUIZVRAAG            not null,
    VRAAGSOORT           VRAAGSOORT           not null,
+   AFBEELDING_BESTANDSNAAM NAAM                 null,
+   AUDIO_BESTANDSNAAM   NAAM                 null,
    constraint PK_VRAAGONDERDEEL primary key nonclustered (VRAAGONDERDEEL_ID),
    constraint AK_NATURAL_VRAAGOND unique (VRAAGONDERDEELNUMMER, VRAAG_ID)
 )
@@ -922,23 +1314,65 @@ VRAAG_ID ASC
 )
 go
 
+/*==============================================================*/
+/* Index: AUDIO_BIJ_VRAAGONDERDEEL_FK                           */
+/*==============================================================*/
+create index AUDIO_BIJ_VRAAGONDERDEEL_FK on VRAAGONDERDEEL (
+AUDIO_BESTANDSNAAM ASC
+)
+go
+
+/*==============================================================*/
+/* Index: AFBEELDING_BIJ_VRAAGONDERDEEL_FK                      */
+/*==============================================================*/
+create index AFBEELDING_BIJ_VRAAGONDERDEEL_FK on VRAAGONDERDEEL (
+AFBEELDING_BESTANDSNAAM ASC
+)
+go
+
 alter table ALTERNATIEVEPUNTEN
-   add constraint FK_ALTERNAT_ALTERNATI_PUBQUIZR foreign key (EVENEMENT_ID, RONDENUMMER, VRAAG_ID)
-      references PUBQUIZRONDEVRAAG (EVENEMENT_ID, RONDENUMMER, VRAAG_ID)
+   add constraint FK_ALTERNAT_ALTERNATI_PUBQUIZR foreign key (EVENEMENT_ID, RONDENUMMER)
+      references PUBQUIZRONDE (EVENEMENT_ID, RONDENUMMER)
 go
 
 alter table ALTERNATIEVEPUNTEN
    add constraint FK_ALTERNAT_ALTERNATI_ANTWOORD foreign key (ANTWOORD_ID)
       references ANTWOORD (ANTWOORD_ID)
 go
+
 alter table ANTWOORD
    add constraint FK_ANTWOORD_ANTWOORD__VRAAGOND foreign key (VRAAGONDERDEEL_ID)
       references VRAAGONDERDEEL (VRAAGONDERDEEL_ID)
 go
 
+alter table DEELNEMER_IN_EEN_TEAM
+   add constraint FK_DEELNEME_DEELNEMER_TEAM foreign key (EVENEMENT_ID, TEAM_NAAM)
+      references TEAM (EVENEMENT_ID, TEAM_NAAM)
+go
+
+alter table DEELNEMER_IN_EEN_TEAM
+   add constraint FK_DEELNEME_DEELNEMER_DEELNEME foreign key (EMAIL_ADRES)
+      references DEELNEMER (EMAIL_ADRES)
+go
+
 alter table EVENEMENT
    add constraint FK_EVENEMEN_EVENEMENT_LOCATIE foreign key (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
       references LOCATIE (PLAATSNAAM, ADRES, HUISNUMMER, HUISNUMMER_TOEVOEGING)
+go
+
+alter table GEGEVENANTWOORD
+   add constraint FK_GEGEVENA_ANTWOORD__PUBQUIZR foreign key (EVENEMENT_ID, RONDENUMMER)
+      references PUBQUIZRONDE (EVENEMENT_ID, RONDENUMMER)
+go
+
+alter table GEGEVENANTWOORD
+   add constraint FK_GEGEVENA_ANTWOORD__TEAM foreign key (EVENEMENT_ID, TEAM_NAAM)
+      references TEAM (EVENEMENT_ID, TEAM_NAAM)
+go
+
+alter table GEGEVENANTWOORD
+   add constraint FK_GEGEVENA_GEGEVEN_A_VRAAGOND foreign key (VRAAGONDERDEEL_ID)
+      references VRAAGONDERDEEL (VRAAGONDERDEEL_ID)
 go
 
 alter table NUMMER
@@ -986,6 +1420,11 @@ alter table STEM
       references STEMMER (EMAILADRES)
 go
 
+alter table TEAM
+   add constraint FK_TEAM_TEAM_DEEL_PUBQUIZ foreign key (EVENEMENT_ID)
+      references PUBQUIZ (EVENEMENT_ID)
+go
+
 alter table THEMA_BIJ_VRAAG
    add constraint FK_THEMA_BI_THEMA_BIJ_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
@@ -999,6 +1438,31 @@ go
 alter table TOP100
    add constraint FK_TOP100_IS_EEN_EV_EVENEMEN foreign key (EVENEMENT_ID)
       references EVENEMENT (EVENEMENT_ID)
+go
+
+alter table VRAAG
+   add constraint FK_VRAAG_AFBEELDIN_AFBEELDI foreign key (AFBEELDING_BESTANDSNAAM)
+      references AFBEELDING (AFBEELDING_BESTANDSNAAM)
+go
+
+alter table VRAAG
+   add constraint FK_VRAAG_AUDIO_BIJ_AUDIO foreign key (AUDIO_BESTANDSNAAM)
+      references AUDIO (AUDIO_BESTANDSNAAM)
+go
+
+alter table VRAAG
+   add constraint FK_VRAAG_VIDEO_BIJ_VIDEO foreign key (VIDEO_BESTANDSNAAM)
+      references VIDEO (VIDEO_BESTANDSNAAM)
+go
+
+alter table VRAAGONDERDEEL
+   add constraint FK_VRAAGOND_AFBEELDIN_AFBEELDI foreign key (AFBEELDING_BESTANDSNAAM)
+      references AFBEELDING (AFBEELDING_BESTANDSNAAM)
+go
+
+alter table VRAAGONDERDEEL
+   add constraint FK_VRAAGOND_AUDIO_BIJ_AUDIO foreign key (AUDIO_BESTANDSNAAM)
+      references AUDIO (AUDIO_BESTANDSNAAM)
 go
 
 alter table VRAAGONDERDEEL
