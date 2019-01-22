@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     15-1-2019 10:00:34                            */
+/* Created on:     22-1-2019 10:41:30                           */
 /*==============================================================*/
 
 USE master
@@ -18,6 +18,20 @@ GO
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('ALTERNATIEVEPUNTEN') and o.name = 'FK_ALTERNAT_ALTERNATI_PUBQUIZR')
+alter table ALTERNATIEVEPUNTEN
+   drop constraint FK_ALTERNAT_ALTERNATI_PUBQUIZR
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('ALTERNATIEVEPUNTEN') and o.name = 'FK_ALTERNAT_ALTERNATI_ANTWOORD')
+alter table ALTERNATIEVEPUNTEN
+   drop constraint FK_ALTERNAT_ALTERNATI_ANTWOORD
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')																								  
    where r.fkeyid = object_id('ANTWOORD') and o.name = 'FK_ANTWOORD_ANTWOORD__VRAAGOND')
 alter table ANTWOORD
    drop constraint FK_ANTWOORD_ANTWOORD__VRAAGOND
@@ -119,6 +133,31 @@ if exists (select 1
    where r.fkeyid = object_id('VRAAGONDERDEEL') and o.name = 'FK_VRAAGOND_VRAAGONDE_VRAAG')
 alter table VRAAGONDERDEEL
    drop constraint FK_VRAAGOND_VRAAGONDE_VRAAG
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('ALTERNATIEVEPUNTEN')
+            and   name  = 'ALTERNATIEVE_PUNTEN_VOOR_EEN_ANTWOORD_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index ALTERNATIEVEPUNTEN.ALTERNATIEVE_PUNTEN_VOOR_EEN_ANTWOORD_FK
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('ALTERNATIEVEPUNTEN')
+            and   name  = 'ALTERNATIEVE_PUNTEN_BIJ_EEN_RONDE_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index ALTERNATIEVEPUNTEN.ALTERNATIEVE_PUNTEN_BIJ_EEN_RONDE_FK
+go
+
+if exists (select 1
+            from  sysobjects
+           where  id = object_id('ALTERNATIEVEPUNTEN')
+            and   type = 'U')
+   drop table ALTERNATIEVEPUNTEN
 go
 
 if exists (select 1
@@ -567,6 +606,37 @@ execute sp_bindrule R_WEGING, WEGING
 go
 
 /*==============================================================*/
+/* Table: ALTERNATIEVEPUNTEN                                    */
+/*==============================================================*/
+create table ALTERNATIEVEPUNTEN (
+   EVENEMENT_ID         SURROGATE_KEY        not null,
+   RONDENUMMER          VOLGNUMMER           not null,
+   VRAAG_ID             SURROGATE_KEY        not null,
+   ANTWOORD_ID          SURROGATE_KEY        not null,
+   ALTERNATIEVE_PUNTEN  PUNTEN               not null,
+   constraint PK_ALTERNATIEVEPUNTEN primary key (EVENEMENT_ID, RONDENUMMER, VRAAG_ID, ANTWOORD_ID)
+)
+go
+
+/*==============================================================*/
+/* Index: ALTERNATIEVE_PUNTEN_BIJ_EEN_RONDE_FK                  */
+/*==============================================================*/
+create index ALTERNATIEVE_PUNTEN_BIJ_EEN_RONDE_FK on ALTERNATIEVEPUNTEN (
+EVENEMENT_ID ASC,
+RONDENUMMER ASC,
+VRAAG_ID ASC
+)
+go
+
+/*==============================================================*/
+/* Index: ALTERNATIEVE_PUNTEN_VOOR_EEN_ANTWOORD_FK              */
+/*==============================================================*/
+create index ALTERNATIEVE_PUNTEN_VOOR_EEN_ANTWOORD_FK on ALTERNATIEVEPUNTEN (
+ANTWOORD_ID ASC
+)
+go
+
+/*==============================================================*/
 /* Table: ANTWOORD                                              */
 /*==============================================================*/
 create table ANTWOORD (
@@ -818,6 +888,15 @@ VRAAG_ID ASC
 )
 go
 
+alter table ALTERNATIEVEPUNTEN
+   add constraint FK_ALTERNAT_ALTERNATI_PUBQUIZR foreign key (EVENEMENT_ID, RONDENUMMER, VRAAG_ID)
+      references PUBQUIZRONDEVRAAG (EVENEMENT_ID, RONDENUMMER, VRAAG_ID)
+go
+
+alter table ALTERNATIEVEPUNTEN
+   add constraint FK_ALTERNAT_ALTERNATI_ANTWOORD foreign key (ANTWOORD_ID)
+      references ANTWOORD (ANTWOORD_ID)
+go
 alter table ANTWOORD
    add constraint FK_ANTWOORD_ANTWOORD__VRAAGOND foreign key (VRAAGONDERDEEL_ID)
       references VRAAGONDERDEEL (VRAAGONDERDEEL_ID)
@@ -892,3 +971,4 @@ alter table VRAAGONDERDEEL
    add constraint FK_VRAAGOND_VRAAGONDE_VRAAG foreign key (VRAAG_ID)
       references VRAAG (VRAAG_ID)
 go
+
