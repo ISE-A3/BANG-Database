@@ -1,11 +1,12 @@
 USE BANG;
 GO
 
-CREATE or ALTER PROCEDURE dbo.usp_Team_Delete
+CREATE or ALTER PROCEDURE dbo.usp_DeelnemerInEenTeam_Insert
 	@EVENEMENT_NAAM VARCHAR(256),
-	@TEAM_NAAM VARCHAR(256)
+	@TEAM_NAAM VARCHAR(256),
+	@EMAILADRES VARCHAR(256)
 AS
-BEGIN  
+BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
 	DECLARE @startTrancount int = @@TRANCOUNT;
 	BEGIN TRY
@@ -19,7 +20,7 @@ BEGIN
 			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
 			)
 			THROW 50015, 'Dit evenement bestaat niet', 1
-
+		
 		IF NOT EXISTS(
 			SELECT ''
 			FROM PUBQUIZ
@@ -31,7 +32,7 @@ BEGIN
 			)
 			THROW 50010, 'Deze pubquiz bestaat niet', 1
 
-		IF NOT EXISTS (
+		IF NOT EXISTS(
 			SELECT ''
 			FROM TEAM
 			WHERE TEAM_NAAM = @TEAM_NAAM
@@ -42,33 +43,25 @@ BEGIN
 				)
 			)
 			THROW 50012, 'Bij deze pubquiz bestaat er geen team met deze teamnaam', 1
+		
+		IF NOT EXISTS(
+			SELECT ''
+			FROM DEELNEMER
+			WHERE EMAIL_ADRES = @EMAILADRES
+			)
+			THROW 50014, 'Dit emailadres is nog niet geregristreerd', 1
 
 		--succes operatie hier
-		IF EXISTS(
-			SELECT ''
-			FROM DEELNEMER_IN_EEN_TEAM
-			WHERE TEAM_NAAM = @TEAM_NAAM
-			AND EVENEMENT_ID = (
-				SELECT EVENEMENT_ID
-				FROM EVENEMENT
-				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
-				)
-			)
-		BEGIN
-			EXECUTE dbo.usp_DeelnemerInEenTeam_Delete @EVENEMENT_NAAM = @EVENEMENT_NAAM, @TEAM_NAAM = @TEAM_NAAM;
-		END
-
-		DELETE FROM TEAM
-		WHERE TEAM_NAAM = @TEAM_NAAM
-		AND EVENEMENT_ID = (
+		INSERT INTO DEELNEMER_IN_EEN_TEAM (EVENEMENT_ID, TEAM_NAAM, EMAIL_ADRES)
+		VALUES ((
 			SELECT EVENEMENT_ID
 			FROM EVENEMENT
 			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
-			)
+			), @TEAM_NAAM, @EMAILADRES)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
-		COMMIT TRANSACTION 
-	END TRY	  
+		COMMIT TRANSACTION
+	END TRY
 	BEGIN CATCH
 		IF XACT_STATE() = -1 and @startTrancount = 0  -- "doomed" transaction, eigen context only
 			BEGIN
@@ -81,10 +74,10 @@ BEGIN
 				COMMIT TRANSACTION --trancount 1 omlaag
 				PRINT 'Buitentran state 1 met trancount ' + cast(@startTrancount as varchar)
 			END
-			DECLARE @errormessage varchar(2000) 
+			DECLARE @errormessage varchar(2000)
 			SET @errormessage ='Een fout is opgetreden in procedure ''' + object_name(@@procid) + '''.
 			Originele boodschap: ''' + ERROR_MESSAGE() + ''''
-			RAISERROR(@errormessage, 16, 1) --of throw gebruiken, dat kan ook 
+			RAISERROR(@errormessage, 16, 1) --of throw gebruiken, dat kan ook
 	END CATCH
-END;	
+END;
 GO

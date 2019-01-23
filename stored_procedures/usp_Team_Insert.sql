@@ -15,6 +15,13 @@ BEGIN
 		--checks hier
 		IF NOT EXISTS(
 			SELECT ''
+			FROM EVENEMENT
+			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+			)
+			THROW 50015, 'Dit evenement bestaat niet', 1
+
+		IF NOT EXISTS(
+			SELECT ''
 			FROM PUBQUIZ
 			WHERE EVENEMENT_ID = (
 				SELECT EVENEMENT_ID

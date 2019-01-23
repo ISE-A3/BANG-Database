@@ -1,36 +1,17 @@
 USE BANG;
 GO
 
-CREATE or ALTER PROCEDURE dbo.usp_Deelnemer_Delete
-	@EMAILADRES VARCHAR(256)
+CREATE or ALTER PROCEDURE dbo.usp_OngebruikteDeelnemer_DeleteAll
 AS
-BEGIN  
+BEGIN
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
 	DECLARE @startTrancount int = @@TRANCOUNT;
 	BEGIN TRY
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 		
-		--checks hier
-		IF NOT EXISTS (
-			SELECT ''
-			FROM DEELNEMER
-			WHERE EMAIL_ADRES = @EMAILADRES
-			)
-			THROW 50014, 'Dit emailadres is nog niet geregristreerd', 1
-
-		--succes operatie hier
-		IF EXISTS(
-			SELECT ''
-			FROM DEELNEMER_IN_EEN_TEAM
-			WHERE EMAIL_ADRES = @EMAILADRES
-			)
-		BEGIN
-			EXECUTE dbo.usp_DeelnemerInEenTeam_Delete @EMAILADRES = @EMAILADRES;
-		END
-
-		DELETE FROM DEELNEMER
-		WHERE EMAIL_ADRES = @EMAILADRES
+		DELETE DN FROM DEELNEMER DN LEFT JOIN DEELNEMER_IN_EEN_TEAM DIET ON DN.EMAIL_ADRES = DIET.EMAIL_ADRES
+		WHERE DIET.EMAIL_ADRES IS NULL;
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION
