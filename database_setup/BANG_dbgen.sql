@@ -919,10 +919,10 @@ go
 create table ANTWOORD (
    ANTWOORD_ID          SURROGATE_KEY        identity,
    VRAAGONDERDEEL_ID    SURROGATE_KEY        not null,
-   GEGEVEN_ANTWOORD     ANTWOORD_OPTIE       not null,
+   ANTWOORD             ANTWOORD_OPTIE       not null,
    PUNTEN               PUNTEN               not null,
    constraint PK_ANTWOORD primary key nonclustered (ANTWOORD_ID),
-   constraint AK_NATURAL_ANTWOORD unique (GEGEVEN_ANTWOORD, VRAAGONDERDEEL_ID)
+   constraint AK_NATURAL_ANTWOORD unique (ANTWOORD, VRAAGONDERDEEL_ID)
 )
 go
 
