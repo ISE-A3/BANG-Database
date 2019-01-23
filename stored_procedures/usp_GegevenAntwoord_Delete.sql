@@ -2,17 +2,15 @@ USE BANG;
 GO
 
 /*
-INSERT GEGEVENANTWOORD
+DELETE GEGEVENANTWOORD
 */
 
-CREATE or ALTER PROCEDURE dbo.usp_GegevenAntwoord_Insert
+CREATE or ALTER PROCEDURE dbo.usp_GegevenAntwoord_DELETE
 	@EVENEMENT_NAAM VARCHAR(256),
 	@TEAM_NAAM VARCHAR(256),
 	@RONDENUMMER INT,
 	@VRAAG_NAAM VARCHAR(256),
-	@VRAAGONDERDEELNUMMER INT,
-	@GEGEVEN_ANTWOORD VARCHAR(256),
-	@VERDIENDE_PUNTEN INT
+	@VRAAGONDERDEELNUMMER INT
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -34,11 +32,7 @@ BEGIN
 				)
 			)
 		THROW 50003, 'Dit vraagonderdeel bestaat niet', 1;
-
-		--Check of het aantal punten niet lager is dan nul
-		IF @VERDIENDE_PUNTEN < 0
-			THROW 50004, 'Punten kunnen niet lager zijn dan nul(0).', 1;
-
+				
 		--Check of het evenement bestaat
 		IF NOT EXISTS (
 			SELECT ''
@@ -77,56 +71,35 @@ BEGIN
 			)
 		THROW 50223, 'De ronde van dit evenement bestaat niet.', 1;
 
-		--Check waarmee je verzekerd dat er geen antwoorden gegeven kunnen worden voorafgaand aan het evenement
+		--Check die controleert of het evenement al voorbij is
 		IF (
-			GETDATE() < (
+			GETDATE() !> (
 				SELECT EVENEMENT_DATUM
 				FROM EVENEMENT
 				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
 				)
 			)
-		THROW 50416, 'Er kunnen geen antwoorden worden gegeven voorafgaand aan het evenement.', 1;
+		THROW 50418, 'Wacht met het verwijderen van gegeven antwoorden tot minstens de dag ná het evenement.', 1; 
 
 		--succes operatie hier
-		IF EXISTS (
-			SELECT ''
+		DELETE FROM GEGEVENANTWOORD
+		WHERE EVENEMENT_ID IN (
+			SELECT EVENEMENT_ID
+			FROM EVENEMENT 
+			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+			) AND
+		TEAM_NAAM = @TEAM_NAAM AND
+		RONDENUMMER = @RONDENUMMER AND
+		VRAAGONDERDEEL_ID IN (
+			SELECT VRAAGONDERDEEL_ID
 			FROM VRAAGONDERDEEL
 			WHERE VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER AND
 			VRAAG_ID IN (
 				SELECT VRAAG_ID
 				FROM VRAAG
 				WHERE VRAAG_NAAM = @VRAAG_NAAM
-				) AND
-			VRAAGSOORT = 'G'
+				)
 			)
-			BEGIN
-				SELECT @VERDIENDE_PUNTEN = PUNTEN
-				FROM ANTWOORD
-				WHERE VRAAGONDERDEEL_ID IN (
-					SELECT VRAAGONDERDEEL_ID 
-					FROM VRAAGONDERDEEL
-					WHERE VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
-					) AND 
-				ANTWOORD = @GEGEVEN_ANTWOORD
-			END
-		ELSE
-			BEGIN
-			SELECT @VERDIENDE_PUNTEN = NULL
-			END
-
-		INSERT INTO GEGEVENANTWOORD ([EVENEMENT_ID], [TEAM_NAAM], [RONDENUMMER], [VRAAGONDERDEEL_ID], [GEGEVEN_ANTWOORD], [VERDIENDE_PUNTEN])
-		VALUES ((
-			SELECT EVENEMENT_ID
-			FROM EVENEMENT
-			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
-			),
-		@TEAM_NAAM, @RONDENUMMER, (
-			SELECT VRAAGONDERDEEL_ID
-			FROM VRAAGONDERDEEL
-			WHERE VRAAGONDERDEELNUMMER = @VRAAGONDERDEELNUMMER
-			),
-		@GEGEVEN_ANTWOORD, @VERDIENDE_PUNTEN
-		)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
