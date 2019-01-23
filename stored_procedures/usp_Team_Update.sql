@@ -2,8 +2,9 @@ USE BANG;
 GO
 
 CREATE or ALTER PROCEDURE dbo.usp_Team_Update
-	@parameter numeric(2),
-	@parameters numeric(7,2)
+	@EVENEMENT_NAAM VARCHAR(256),
+	@OUDE_TEAM_NAAM VARCHAR(256),
+	@NIEUWE_TEAM_NAAM VARCHAR(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -13,8 +14,50 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		--checks hier
+		IF NOT EXISTS(
+			SELECT ''
+			FROM PUBQUIZ
+			WHERE EVENEMENT_ID = (
+				SELECT EVENEMENT_ID
+				FROM EVENEMENT
+				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+				)
+			)
+			THROW 50010, 'Deze pubquiz bestaat niet', 1
+
+		IF EXISTS (
+			SELECT ''
+			FROM TEAM
+			WHERE TEAM_NAAM = @OUDE_TEAM_NAAM
+			AND EVENEMENT_ID = (
+				SELECT EVENEMENT_ID
+				FROM EVENEMENT
+				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+				)
+			)
+			THROW 50012, 'Bij deze pubquiz bestaat er geen team met deze teamnaam', 1
+
+		IF EXISTS (
+			SELECT ''
+			FROM TEAM
+			WHERE TEAM_NAAM = @NIEUWE_TEAM_NAAM
+			AND EVENEMENT_ID = (
+				SELECT EVENEMENT_ID
+				FROM EVENEMENT
+				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+				)
+			)
+			THROW 50011, 'Bij deze pubquiz is er al een team met deze teamnaam', 1
 
 		--succes operatie hier
+		UPDATE TEAM
+		SET TEAM_NAAM = @NIEUWE_TEAM_NAAM
+		WHERE TEAM_NAAM = @OUDE_TEAM_NAAM
+		AND EVENEMENT_ID = (
+			SELECT EVENEMENT_ID
+			FROM EVENEMENT
+			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+			)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

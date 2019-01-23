@@ -2,8 +2,8 @@ USE BANG;
 GO
 
 CREATE or ALTER PROCEDURE dbo.usp_Team_Delete
-	@parameter numeric(2),
-	@parameters numeric(7,2)
+	@EVENEMENT_NAAM VARCHAR(256),
+	@TEAM_NAAM VARCHAR(256)
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -13,8 +13,37 @@ BEGIN
 		SAVE TRANSACTION @savepoint
 		
 		--checks hier
+		IF NOT EXISTS(
+			SELECT ''
+			FROM PUBQUIZ
+			WHERE EVENEMENT_ID = (
+				SELECT EVENEMENT_ID
+				FROM EVENEMENT
+				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+				)
+			)
+			THROW 50010, 'Deze pubquiz bestaat niet', 1
+
+		IF NOT EXISTS (
+			SELECT ''
+			FROM TEAM
+			WHERE TEAM_NAAM = @TEAM_NAAM
+			AND EVENEMENT_ID = (
+				SELECT EVENEMENT_ID
+				FROM EVENEMENT
+				WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+				)
+			)
+			THROW 50012, 'Bij deze pubquiz bestaat er geen team met deze teamnaam', 1
 
 		--succes operatie hier
+		DELETE FROM TEAM
+		WHERE TEAM_NAAM = @TEAM_NAAM
+		AND EVENEMENT_ID = (
+			SELECT EVENEMENT_ID
+			FROM EVENEMENT
+			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+			)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

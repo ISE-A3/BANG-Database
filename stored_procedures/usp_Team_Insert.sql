@@ -37,6 +37,12 @@ BEGIN
 			THROW 50011, 'Bij deze pubquiz is er al een team met deze teamnaam', 1
 
 		--succes operatie hier
+		INSERT INTO TEAM (EVENEMENT_ID, TEAM_NAAM)
+		VALUES ((
+			SELECT EVENEMENT_ID
+			FROM EVENEMENT
+			WHERE EVENEMENT_NAAM = @EVENEMENT_NAAM
+			), @TEAM_NAAM)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
