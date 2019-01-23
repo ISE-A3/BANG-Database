@@ -1,6 +1,6 @@
 /*==============================================================*/
 /* DBMS name:      Microsoft SQL Server 2008                    */
-/* Created on:     22-1-2019 14:51:52                           */
+/* Created on:     23-1-2019 10:49:02                           */
 /*==============================================================*/
 
 USE master
@@ -88,9 +88,23 @@ go
 
 if exists (select 1
    from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('PUBQUIZ') and o.name = 'FK_PUBQUIZ_AFBEELDIN_AFBEELDI')
+alter table PUBQUIZ
+   drop constraint FK_PUBQUIZ_AFBEELDIN_AFBEELDI
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
    where r.fkeyid = object_id('PUBQUIZ') and o.name = 'FK_PUBQUIZ_IS_EEN_EV_EVENEMEN')
 alter table PUBQUIZ
    drop constraint FK_PUBQUIZ_IS_EEN_EV_EVENEMEN
+go
+
+if exists (select 1
+   from sys.sysreferences r join sys.sysobjects o on (o.id = r.constid and o.type = 'F')
+   where r.fkeyid = object_id('PUBQUIZRONDE') and o.name = 'FK_PUBQUIZR_AFBEELDIN_AFBEELDI')
+alter table PUBQUIZRONDE
+   drop constraint FK_PUBQUIZR_AFBEELDIN_AFBEELDI
 go
 
 if exists (select 1
@@ -380,10 +394,28 @@ if exists (select 1
 go
 
 if exists (select 1
+            from  sysindexes
+           where  id    = object_id('PUBQUIZ')
+            and   name  = 'AFBEELDING_BIJ_PUBQUIZ_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index PUBQUIZ.AFBEELDING_BIJ_PUBQUIZ_FK
+go
+
+if exists (select 1
             from  sysobjects
            where  id = object_id('PUBQUIZ')
             and   type = 'U')
    drop table PUBQUIZ
+go
+
+if exists (select 1
+            from  sysindexes
+           where  id    = object_id('PUBQUIZRONDE')
+            and   name  = 'AFBEELDING_BIJ_PUBQUIZRONDE_FK'
+            and   indid > 0
+            and   indid < 255)
+   drop index PUBQUIZRONDE.AFBEELDING_BIJ_PUBQUIZRONDE_FK
 go
 
 if exists (select 1
@@ -1068,7 +1100,16 @@ go
 create table PUBQUIZ (
    EVENEMENT_ID         SURROGATE_KEY        not null,
    PUBQUIZ_TITEL        NAAM                 not null,
+   AFBEELDING_BESTANDSNAAM NAAM                 null,
    constraint PK_PUBQUIZ primary key (EVENEMENT_ID)
+)
+go
+
+/*==============================================================*/
+/* Index: AFBEELDING_BIJ_PUBQUIZ_FK                             */
+/*==============================================================*/
+create index AFBEELDING_BIJ_PUBQUIZ_FK on PUBQUIZ (
+AFBEELDING_BESTANDSNAAM ASC
 )
 go
 
@@ -1080,6 +1121,7 @@ create table PUBQUIZRONDE (
    RONDENUMMER          VOLGNUMMER           not null,
    THEMA                THEMA_NAAM           not null,
    RONDENAAM            NAAM                 null,
+   AFBEELDING_BESTANDSNAAM NAAM                 null,
    constraint PK_PUBQUIZRONDE primary key nonclustered (EVENEMENT_ID, RONDENUMMER)
 )
 go
@@ -1097,6 +1139,14 @@ go
 /*==============================================================*/
 create index THEMA_VAN_PUBQUIZRONDE_FK on PUBQUIZRONDE (
 THEMA ASC
+)
+go
+
+/*==============================================================*/
+/* Index: AFBEELDING_BIJ_PUBQUIZRONDE_FK                        */
+/*==============================================================*/
+create index AFBEELDING_BIJ_PUBQUIZRONDE_FK on PUBQUIZRONDE (
+AFBEELDING_BESTANDSNAAM ASC
 )
 go
 
@@ -1381,8 +1431,18 @@ alter table NUMMER
 go
 
 alter table PUBQUIZ
+   add constraint FK_PUBQUIZ_AFBEELDIN_AFBEELDI foreign key (AFBEELDING_BESTANDSNAAM)
+      references AFBEELDING (AFBEELDING_BESTANDSNAAM)
+go
+
+alter table PUBQUIZ
    add constraint FK_PUBQUIZ_IS_EEN_EV_EVENEMEN foreign key (EVENEMENT_ID)
       references EVENEMENT (EVENEMENT_ID)
+go
+
+alter table PUBQUIZRONDE
+   add constraint FK_PUBQUIZR_AFBEELDIN_AFBEELDI foreign key (AFBEELDING_BESTANDSNAAM)
+      references AFBEELDING (AFBEELDING_BESTANDSNAAM)
 go
 
 alter table PUBQUIZRONDE
