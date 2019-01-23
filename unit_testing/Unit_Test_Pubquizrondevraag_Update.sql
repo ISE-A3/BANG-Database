@@ -11,8 +11,6 @@ BEGIN
 	EXEC tSQLt.FakeTable 'dbo', 'PUBQUIZRONDEVRAAG';
 	EXEC tSQLt.FakeTable 'dbo', 'VRAAG';
 
-	EXEC [tSQLt].[ExpectNoException] 
-
 	IF OBJECTPROPERTY(OBJECT_ID('[dbo].[EVENEMENT]'), 'TableHasIdentity') = 1
 	SET IDENTITY_INSERT [dbo].[EVENEMENT] ON
 
@@ -30,12 +28,41 @@ BEGIN
 	EXECUTE dbo.usp_Pubquizronde_Insert 'Pubquiz1', 1, 'Sport', 1;
 	EXECUTE dbo.usp_Pubquizrondevraag_Insert 'Pubquiz1', 1, 'Olympische Spelen', 1
 
-	--EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, 2;	--test voor rondenr update
-	--EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, 2;	--test voor vraagnr update
-	--EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, NULL, 'ols';		--test voor vraag_id update
-	--EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, 1;	--test voor foutieve invoer van nieuw vraagnr
-	--EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, 3, 1, 2, 'ols';		--test voor multiple updates
+	/*
+	--TEST 1) test voor rondenr update
+	EXEC [tSQLt].[ExpectNoException] 
 
+	EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, 2;	
+	*/
+
+	/*
+	--TEST 2) test voor vraagnr update
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, 2;
+	*/
+
+	/*
+	--TEST 3) test voor vraag_id update
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, NULL, 'ols';
+	*/
+
+	/*
+	--TEST 4) test voor foutieve invoer van nieuw vraagnr
+	EXEC [tSQLt].[ExpectException] @ExpectedMessage = 'Een fout is opgetreden in procedure ''usp_Pubquizrondevraag_Update''.
+			Originele boodschap: ''Er bestaat al een vraag met dit volgnummer'''
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, NULL, 1, 1;
+	*/
+
+	/*
+	--TEST 5) test voor multiple updates
+	EXEC [tSQLt].[ExpectNoException] 
+
+	EXECUTE dbo.usp_Pubquizrondevraag_Update 'Pubquiz1', 1, 3, 1, 2, 'ols';
+	*/
 END
 GO
 
