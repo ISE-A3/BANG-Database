@@ -7,7 +7,10 @@ INSERT VRAAG
 
 CREATE or ALTER PROCEDURE dbo.usp_Vraag_Insert
 @VRAAG_NAAM varchar(256),
-@VRAAG_TITEL varchar(256) = NULL
+@VRAAG_TITEL varchar(256) = NULL,
+@AUDIO varchar(256) = NULL,
+@AFBEELDING varchar(256) = NULL,
+@VIDEO varchar(256) = NULL
 AS
 BEGIN  
 	DECLARE @savepoint varchar(128) = CAST(OBJECT_NAME(@@PROCID) as varchar(125)) + CAST(@@NESTLEVEL AS varchar(3))
@@ -23,9 +26,21 @@ BEGIN
 		IF (@VRAAG_NAAM IS NULL)
 			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
 
+		IF @AUDIO IS NOT NULL AND NOT EXISTS (SELECT '' FROM AUDIO WHERE AUDIO_BESTANDSNAAM = @AUDIO)
+			THROW 50260, 'Het audiobestand bestaat niet', 1
+
+		IF @AFBEELDING IS NOT NULL AND NOT EXISTS (SELECT '' FROM AFBEELDING WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING)
+			THROW 50261, 'De afbeelding bestaat niet', 1
+
+		IF @VIDEO IS NOT NULL AND NOT EXISTS (SELECT '' FROM VIDEO WHERE VIDEO_BESTANDSNAAM = @VIDEO)
+			THROW 50262, 'Het videobestand bestaat niet', 1
+
+		IF @VIDEO IS NOT NULL AND (@AFBEELDING IS NOT NULL OR @AUDIO IS NOT NULL)
+			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten', 1
+
 		--succes operatie hier
 		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
-		VALUES (@VRAAG_NAAM, @VRAAG_TITEL)
+		VALUES (@VRAAG_NAAM, @VRAAG_TITEL, @AFBEELDING, @AUDIO, @VIDEO)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 

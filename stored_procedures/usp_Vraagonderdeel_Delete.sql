@@ -102,6 +102,9 @@ BEGIN
 					)
 		END
 
+		EXEC dbo.usp_Afbeelding_Delete
+		EXEC dbo.usp_Audio_Delete
+
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
 	END TRY	  
