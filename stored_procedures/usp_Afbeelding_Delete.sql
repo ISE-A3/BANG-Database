@@ -25,16 +25,16 @@ BEGIN
 			THROW 50246, 'De afbeelding bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM PUBQUIZ WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING_BESTANDSNAAM)
-			THROW 50247, 'De afbeelding wordt nog gebruikt bij een pubquiz', 1
+			THROW 50247, 'De afbeelding wordt nog gebruikt bij een pubquiz.', 1
 
 		IF EXISTS (SELECT '' FROM PUBQUIZRONDE WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING_BESTANDSNAAM)
-			THROW 50248, 'De afbeelding wordt nog gebruikt bij een pubquizronde', 1
+			THROW 50248, 'De afbeelding wordt nog gebruikt bij een pubquizronde.', 1
 
 		IF EXISTS (SELECT '' FROM VRAAG WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING_BESTANDSNAAM)
-			THROW 50249, 'De afbeelding wordt nog gebruikt bij een vraag', 1
+			THROW 50249, 'De afbeelding wordt nog gebruikt bij een vraag.', 1
 
 		IF EXISTS (SELECT '' FROM VRAAGONDERDEEL WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING_BESTANDSNAAM)
-			THROW 50250, 'De afbeelding wordt nog gebruikt bij een vraagonderdeel', 1
+			THROW 50250, 'De afbeelding wordt nog gebruikt bij een vraagonderdeel.', 1
 	
 		--succes operatie hier
 		DELETE FROM AFBEELDING

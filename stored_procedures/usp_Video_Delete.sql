@@ -22,7 +22,7 @@ BEGIN
 			THROW 50251, 'De video bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM VRAAG WHERE VIDEO_BESTANDSNAAM = @VIDEO_BESTANDSNAAM)
-			THROW 50252, 'De video wordt nog gebruikt bij een vraag', 1
+			THROW 50252, 'De video wordt nog gebruikt bij een vraag.', 1
 	
 		--succes operatie hier
 		DELETE FROM VIDEO

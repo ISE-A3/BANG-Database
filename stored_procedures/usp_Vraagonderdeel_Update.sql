@@ -32,7 +32,7 @@ BEGIN
 				THROW 50009, 'Het vraagsoort kan alleen O(open) of G(gesloten) zijn', 1
 
 		IF @AFBEELDING IS NOT NULL AND @AUDIO IS NOT NULL
-			THROW 50273, 'Een vraagonderdeel mag een afbeelding of audio hebben.', 1
+			THROW 50273, 'Een vraagonderdeel mag een afbeelding of audiobestand hebben.', 1
 
 		IF @AFBEELDING IS NOT NULL
 			IF NOT EXISTS (SELECT '' FROM AFBEELDING WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING)

@@ -47,10 +47,10 @@ BEGIN
 		
 		IF @VIDEO IS NOT NULL
 			IF NOT EXISTS (SELECT '' FROM VIDEO WHERE VIDEO_BESTANDSNAAM = @VIDEO)
-				THROW 50724, 'Het videobestand bestaat niet', 1
+				THROW 50724, 'Het videobestand bestaat niet.', 1
 
 		IF @VIDEO IS NOT NULL AND (@AFBEELDING IS NOT NULL OR @AUDIO IS NOT NULL)
-			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten', 1
+			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten.', 1
 
 		--succes operatie hier
 		UPDATE VRAAG

@@ -27,16 +27,16 @@ BEGIN
 			THROW 50221, 'Een vraagnaam moet ingevuld worden', 1
 
 		IF @AUDIO IS NOT NULL AND NOT EXISTS (SELECT '' FROM AUDIO WHERE AUDIO_BESTANDSNAAM = @AUDIO)
-			THROW 50260, 'Het audiobestand bestaat niet', 1
+			THROW 50260, 'Het audiobestand bestaat niet.', 1
 
 		IF @AFBEELDING IS NOT NULL AND NOT EXISTS (SELECT '' FROM AFBEELDING WHERE AFBEELDING_BESTANDSNAAM = @AFBEELDING)
-			THROW 50261, 'De afbeelding bestaat niet', 1
+			THROW 50261, 'De afbeelding bestaat niet.', 1
 
 		IF @VIDEO IS NOT NULL AND NOT EXISTS (SELECT '' FROM VIDEO WHERE VIDEO_BESTANDSNAAM = @VIDEO)
-			THROW 50262, 'Het videobestand bestaat niet', 1
+			THROW 50262, 'Het videobestand bestaat niet.', 1
 
 		IF @VIDEO IS NOT NULL AND (@AFBEELDING IS NOT NULL OR @AUDIO IS NOT NULL)
-			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten', 1
+			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten.', 1
 
 		--succes operatie hier
 		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)

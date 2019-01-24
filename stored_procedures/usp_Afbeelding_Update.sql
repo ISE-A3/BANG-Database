@@ -17,7 +17,7 @@ BEGIN
 			THROW 50270, 'De afbeelding bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM AFBEELDING WHERE AFBEELDING_BESTANDLOCATIE = @AFBEELDING_BESTANDSLOCATIE)
-			THROW 50270, 'De afbeelding komt al voor', 1
+			THROW 50270, 'De afbeelding komt al voor.', 1
 	
 		--succes operatie hier
 		UPDATE AFBEELDING

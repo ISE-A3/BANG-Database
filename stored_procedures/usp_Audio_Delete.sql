@@ -23,10 +23,10 @@ BEGIN
 			THROW 50243, 'Het audiobestand bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM VRAAG WHERE AUDIO_BESTANDSNAAM = @AUDIO_BESTANDSNAAM)
-			THROW 50244, 'De audio wordt nog gebruikt bij een vraag', 1
+			THROW 50244, 'De audio wordt nog gebruikt bij een vraag.', 1
 
 		IF EXISTS (SELECT '' FROM VRAAGONDERDEEL WHERE AUDIO_BESTANDSNAAM = @AUDIO_BESTANDSNAAM)
-			THROW 50245, 'De audio wordt nog gebruikt bij een vraagonderdeel', 1
+			THROW 50245, 'De audio wordt nog gebruikt bij een vraagonderdeel.', 1
 	
 		--succes operatie hier
 		DELETE FROM AUDIO

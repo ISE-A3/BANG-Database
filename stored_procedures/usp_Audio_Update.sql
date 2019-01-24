@@ -17,7 +17,7 @@ BEGIN
 			THROW 50270, 'Het audiobestand bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM AUDIO WHERE AUDIO_BESTANDSLOCATIE = @AUDIO_BESTANDSLOCATIE)
-			THROW 50270, 'Het audiobestand komt al voor', 1
+			THROW 50270, 'Het audiobestand komt al voor.', 1
 	
 		--succes operatie hier
 		UPDATE AUDIO

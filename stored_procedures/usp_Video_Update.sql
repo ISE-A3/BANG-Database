@@ -17,7 +17,7 @@ BEGIN
 			THROW 50270, 'Het videobestand bestaat niet.', 1
 
 		IF EXISTS (SELECT '' FROM VIDEO WHERE VIDEO_BESTANDSLOCATIE = @VIDEO_BESTANDSLOCATIE)
-			THROW 50270, 'Het videobestand komt al voor', 1
+			THROW 50270, 'Het videobestand komt al voor.', 1
 	
 		--succes operatie hier
 		UPDATE VIDEO
