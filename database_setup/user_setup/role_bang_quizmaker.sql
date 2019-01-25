@@ -109,3 +109,50 @@ GRANT EXECUTE ON OBJECT ::dbo.usp_Vraagonderdeel_Update
     TO bang_quizmaker_role;  
 GO  
 
+GRANT EXECUTE ON OBJECT ::dbo.usp_Afbeelding_Delete
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Afbeelding_Insert
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Afbeelding_Update
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_AlternatievePunten_Delete
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_AlternatievePunten_Insert
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_AlternatievePunten_Update
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Audio_Delete
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Audio_Insert
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Audio_Update
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Video_Delete
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Video_Insert
+    TO bang_quizmaker_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Video_Update
+    TO bang_quizmaker_role;  
+GO  

@@ -69,8 +69,43 @@ GRANT EXECUTE ON OBJECT ::dbo.usp_Top100Artiest_SelectTop100
     TO bang_organisator_role;  
 GO  
 
+GRANT EXECUTE ON OBJECT ::dbo.usp_Top100Artiest_SelectAll
+    TO bang_organisator_role;  
+GO  
+
 GRANT EXECUTE ON OBJECT ::dbo.usp_Top100Info_Select
     TO bang_organisator_role;  
 GO  
 
+GRANT EXECUTE ON OBJECT ::dbo.usp_DeelnemerInEenTeam_Delete
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_DeelnemerInEenTeam_Insert
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Deelnemer_Delete
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Deelnemer_Insert
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Deelnemer_Update
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_OngebruikteDeelnemer_Delete
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Team_Delete
+    TO bang_organisator_role;  
+GO  
+
+GRANT EXECUTE ON OBJECT ::dbo.usp_Team_Insert
+    TO bang_organisator_role;  
+GO  
 

@@ -1,12 +1,6 @@
 USE BANG
 GO
 
-CREATE USER [BANG_FRONT_END] FOR LOGIN [BANG_FRONT_END];
-GO
-ALTER ROLE db_owner ADD MEMBER [BANG_FRONT_END];
-go
-GO
-
 CREATE USER [bang_organisator] FOR LOGIN [bang_organisator];
 GO
 ALTER ROLE [bang_organisator_role] ADD MEMBER [bang_organisator];
