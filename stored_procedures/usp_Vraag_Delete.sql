@@ -15,6 +15,8 @@ BEGIN
 		BEGIN TRANSACTION
 		SAVE TRANSACTION @savepoint
 
+		DECLARE @MEDIA VARCHAR(256)
+
 		--checks hier
 		IF NOT EXISTS (
 			SELECT ''
@@ -56,9 +58,13 @@ BEGIN
 					) 
 				)
 				EXECUTE dbo.usp_Thema_Bij_Vraag_Delete @VRAAG_NAAM = @VRAAG_NAAM
-
+		
 		DELETE FROM VRAAG
 		WHERE VRAAG_NAAM = @VRAAG_NAAM
+
+		EXEC dbo.usp_Afbeelding_Delete
+		EXEC dbo.usp_Audio_Delete
+		EXEC dbo.usp_Video_Delete
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
 		COMMIT TRANSACTION 
