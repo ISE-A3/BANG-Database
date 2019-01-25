@@ -39,7 +39,7 @@ BEGIN
 			THROW 50263, 'Alleen een van video, afbeelding, audio of afbeelding en audio mag bij een vraag zitten.', 1
 
 		--succes operatie hier
-		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL)
+		INSERT INTO VRAAG(VRAAG_NAAM, VRAAG_TITEL, AFBEELDING_BESTANDSNAAM, AUDIO_BESTANDSNAAM, VIDEO_BESTANDSNAAM)
 		VALUES (@VRAAG_NAAM, @VRAAG_TITEL, @AFBEELDING, @AUDIO, @VIDEO)
 
 		--als flow tot dit punt komt transactie counter met 1 verlagen
